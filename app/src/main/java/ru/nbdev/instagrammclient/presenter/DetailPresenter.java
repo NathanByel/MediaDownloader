@@ -29,7 +29,7 @@ public class DetailPresenter extends MvpPresenter<DetailView> {
     }
 
     public void onCreate() {
-        if (position != -1) {
+        if ((position >= 0) && (position < imagesData.getImagesList().size())) {
             getViewState().setDetailImage(imagesData.getImagesList().get(position));
         }
     }
