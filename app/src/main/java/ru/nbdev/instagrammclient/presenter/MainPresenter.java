@@ -3,10 +3,15 @@ package ru.nbdev.instagrammclient.presenter;
 import android.content.res.Resources;
 import android.util.Log;
 
+import com.arellomobile.mvp.InjectViewState;
+import com.arellomobile.mvp.MvpPresenter;
+
 import ru.nbdev.instagrammclient.model.ImagesData;
 import ru.nbdev.instagrammclient.view.MainAdapter;
+import ru.nbdev.instagrammclient.view.MainView;
 
-public class MainPresenter {
+@InjectViewState
+public class MainPresenter extends MvpPresenter<MainView> {
     private static final String TAG = "MainPresenter";
     private RecyclerPresenter recyclerPresenter;
     private Resources resources;
@@ -30,14 +35,18 @@ public class MainPresenter {
 
         @Override
         public void bindView(MainAdapter.MainViewHolder mainViewHolder) {
-            mainViewHolder.setImage(imagesData.getImagesList().get(mainViewHolder.getAdapterPosition()));
+            int position = mainViewHolder.getAdapterPosition();
+            mainViewHolder.setImage(imagesData.getImagesList().get(position));
+            mainViewHolder.setOnClickListener(v -> onItemClick(position));
         }
 
         @Override
-        public void onItemClick() {
+        public void onItemClick(int position) {
             int count = imagesData.getClickCount() + 1;
             imagesData.setClickCount(count);
             Log.d(TAG, "Click count = " + count);
+
+            getViewState().runDetailActivity(position);
         }
     }
 }

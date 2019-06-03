@@ -7,5 +7,5 @@ public interface MvpRecyclerPresenter {
 
     void bindView(MainAdapter.MainViewHolder mainViewHolder);
 
-    void onItemClick();
+    void onItemClick(int position);
 }

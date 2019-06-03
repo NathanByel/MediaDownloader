@@ -29,7 +29,6 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull MainViewHolder mainViewHolder, int position) {
-        mainViewHolder.setOnClickListener(v -> mvpRecyclerPresenter.onItemClick());
         mvpRecyclerPresenter.bindView(mainViewHolder);
     }
 
