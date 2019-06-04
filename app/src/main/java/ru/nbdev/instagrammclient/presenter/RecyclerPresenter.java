@@ -1,11 +1,11 @@
 package ru.nbdev.instagrammclient.presenter;
 
-import ru.nbdev.instagrammclient.view.MainAdapter;
+import ru.nbdev.instagrammclient.view.main.MainAdapter;
 
-public interface MvpRecyclerPresenter {
+public interface RecyclerPresenter {
     int getItemCount();
 
     void bindView(MainAdapter.MainViewHolder mainViewHolder);
 
-    void onItemClick(int position);
+    void onItemClick(String detailURL);
 }
