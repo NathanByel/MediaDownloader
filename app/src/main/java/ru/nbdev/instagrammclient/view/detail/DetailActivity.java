@@ -1,46 +1,40 @@
-package ru.nbdev.instagrammclient.view;
+package ru.nbdev.instagrammclient.view.detail;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.widget.ImageView;
 
 import com.arellomobile.mvp.MvpAppCompatActivity;
 import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
 
 import ru.nbdev.instagrammclient.Constants;
 import ru.nbdev.instagrammclient.R;
+import ru.nbdev.instagrammclient.model.GlideLoader;
 import ru.nbdev.instagrammclient.presenter.DetailPresenter;
 
 public class DetailActivity extends MvpAppCompatActivity implements DetailView {
 
     private ImageView detailImage;
+    private GlideLoader glideLoader;
 
     @InjectPresenter
     DetailPresenter presenter;
-
-    @ProvidePresenter
-    DetailPresenter provideDetailsPresenter() {
-        return new DetailPresenter(getResources());
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        int position = getIntent().getIntExtra(Constants.EXTRA_POSITION_INT, -1);
-        presenter.setPosition(position);
+        String detailURL = getIntent().getStringExtra(Constants.EXTRA_DETAIL_URL_STRING);
+        presenter.setDetailURL(detailURL);
 
         detailImage = findViewById(R.id.image_detail);
         detailImage.setOnClickListener(v -> presenter.onImageClick());
 
-        presenter.onCreate();
+        glideLoader = new GlideLoader(this);
     }
 
-
     @Override
-    public void setDetailImage(Drawable image) {
-        detailImage.setImageDrawable(image);
+    public void setDetailPhoto(String url) {
+        glideLoader.loadImage(url, detailImage);
     }
 }

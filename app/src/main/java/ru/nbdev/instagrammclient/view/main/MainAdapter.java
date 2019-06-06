@@ -1,6 +1,6 @@
-package ru.nbdev.instagrammclient.view;
+package ru.nbdev.instagrammclient.view.main;
 
-import android.graphics.drawable.Drawable;
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,14 +8,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import ru.nbdev.instagrammclient.presenter.MvpRecyclerPresenter;
+import ru.nbdev.instagrammclient.model.GlideLoader;
+import ru.nbdev.instagrammclient.presenter.RecyclerPresenter;
 import ru.nbdev.instagrammclient.R;
 
 public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
-    private MvpRecyclerPresenter mvpRecyclerPresenter;
+    private RecyclerPresenter recyclerPresenter;
+    private GlideLoader glideLoader;
 
-    public MainAdapter(MvpRecyclerPresenter mvpRecyclerPresenter) {
-        this.mvpRecyclerPresenter = mvpRecyclerPresenter;
+    public MainAdapter(Context context, RecyclerPresenter recyclerPresenter) {
+        this.recyclerPresenter = recyclerPresenter;
+        glideLoader = new GlideLoader(context);
     }
 
     @NonNull
@@ -29,15 +32,15 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull MainViewHolder mainViewHolder, int position) {
-        mvpRecyclerPresenter.bindView(mainViewHolder);
+        recyclerPresenter.bindView(mainViewHolder);
     }
 
     @Override
     public int getItemCount() {
-        return mvpRecyclerPresenter.getItemCount();
+        return recyclerPresenter.getItemCount();
     }
 
-    public class MainViewHolder extends RecyclerView.ViewHolder implements MvpViewHolder {
+    public class MainViewHolder extends RecyclerView.ViewHolder implements ru.nbdev.instagrammclient.view.main.MainViewHolder {
         private ImageView imageView;
 
         public MainViewHolder(@NonNull View itemView) {
@@ -50,8 +53,8 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder
         }
 
         @Override
-        public void setImage(Drawable drawable) {
-            imageView.setImageDrawable(drawable);
+        public void setImage(String url) {
+            glideLoader.loadImage(url, imageView);
         }
     }
 }
