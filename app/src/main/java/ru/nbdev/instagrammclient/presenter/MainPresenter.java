@@ -1,6 +1,5 @@
 package ru.nbdev.instagrammclient.presenter;
 
-import android.content.res.Resources;
 import android.util.Log;
 
 import com.arellomobile.mvp.InjectViewState;
@@ -8,13 +7,17 @@ import com.arellomobile.mvp.MvpPresenter;
 
 import java.util.List;
 
-import io.reactivex.Observable;
+import javax.inject.Inject;
+
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import ru.nbdev.instagrammclient.R;
+import ru.nbdev.instagrammclient.app.App;
 import ru.nbdev.instagrammclient.model.entity.Photo;
-import ru.nbdev.instagrammclient.model.entity.PhotosList;
-import ru.nbdev.instagrammclient.model.retrofit.ApiHelper;
+import ru.nbdev.instagrammclient.model.retrofit.PixabayApiHelper;
+import ru.nbdev.instagrammclient.model.room.AppDatabase;
 import ru.nbdev.instagrammclient.view.main.MainAdapter;
 import ru.nbdev.instagrammclient.view.main.MainView;
 
@@ -22,13 +25,16 @@ import ru.nbdev.instagrammclient.view.main.MainView;
 public class MainPresenter extends MvpPresenter<MainView> {
     private static final String TAG = "MainPresenter";
     private RecyclerPresenter recyclerPresenter;
-    private Resources resources;
-    private ApiHelper apiHelper;
     private List<Photo> photosList;
 
-    public MainPresenter(Resources resources) {
-        this.resources = resources;
-        apiHelper = new ApiHelper();
+    @Inject
+    PixabayApiHelper pixabayApiHelper;
+
+    @Inject
+    AppDatabase database;
+
+    public MainPresenter() {
+        App.getAppComponent().inject(this);
         recyclerPresenter = new RecyclerPresenter();
     }
 
@@ -38,16 +44,49 @@ public class MainPresenter extends MvpPresenter<MainView> {
     }
 
     private void loadPhotosList() {
-        Observable<PhotosList> single = apiHelper.requestPhotosList();
+        Disposable disposable = database.pixabayDao().getPhotosList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(photos -> {
+                    if (photos.size() == 0) {
+                        loadPhotosListFromInternet();
+                    } else {
+                        photosList = photos;
+                        updateRecycler();
+                    }
+                }, throwable -> {
+                    Log.e(TAG, "Not found. " + throwable.toString());
+                });
+    }
 
-        Disposable disposable = single.observeOn(AndroidSchedulers.mainThread()).subscribe(photos -> {
-            photosList = photos.hits;
-            getViewState().showMessage("Photos count: " + photosList.size());
+    private void loadPhotosListFromInternet() {
+        Disposable disposable = pixabayApiHelper.requestPhotosList()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(photos -> {
+                    photosList = photos.hits;
+                    savePhotosListToDatabase();
+                    updateRecycler();
+                }, throwable -> {
+                    Log.e(TAG, "onError " + throwable);
+                    getViewState().showMessage(R.string.load_error);
+                });
+    }
+
+    private void savePhotosListToDatabase() {
+        Disposable disposable = Single.fromCallable(() -> database.pixabayDao().insertList(photosList))
+                .subscribeOn(Schedulers.io())
+                //.observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        items -> Log.d(TAG, "Added records to DB, " + items.size()),
+                        throwable -> Log.e(TAG, "Error save to DB, " + throwable)
+                );
+    }
+
+    private void updateRecycler() {
+        if (photosList != null) {
+            getViewState().showPhotosCount(photosList.size());
             getViewState().updateRecyclerView();
-        }, throwable -> {
-            Log.e(TAG, "onError " + throwable);
-            getViewState().showMessage(resources.getString(R.string.load_error));
-        });
+        }
     }
 
     public RecyclerPresenter getRecyclerPresenter() {
@@ -67,12 +106,12 @@ public class MainPresenter extends MvpPresenter<MainView> {
         public void bindView(MainAdapter.MainViewHolder mainViewHolder) {
             Photo photo = photosList.get(mainViewHolder.getAdapterPosition());
             mainViewHolder.setImage(photo.previewURL);
-            mainViewHolder.setOnClickListener(v -> onItemClick(photo.largeImageURL));
+            mainViewHolder.setOnClickListener(v -> onItemClick(photo.id));
         }
 
         @Override
-        public void onItemClick(String detailURL) {
-            getViewState().runDetailActivity(detailURL);
+        public void onItemClick(int photoId) {
+            getViewState().runDetailActivity(photoId);
         }
     }
 }

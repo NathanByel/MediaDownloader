@@ -7,5 +7,5 @@ public interface RecyclerPresenter {
 
     void bindView(MainAdapter.MainViewHolder mainViewHolder);
 
-    void onItemClick(String detailURL);
+    void onItemClick(int photoId);
 }
