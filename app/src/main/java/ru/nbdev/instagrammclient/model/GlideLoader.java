@@ -5,7 +5,6 @@ import android.support.v4.widget.CircularProgressDrawable;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import ru.nbdev.instagrammclient.R;
 

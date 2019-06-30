@@ -24,8 +24,8 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        String detailURL = getIntent().getStringExtra(Constants.EXTRA_DETAIL_URL_STRING);
-        presenter.setDetailURL(detailURL);
+        int photoId = getIntent().getIntExtra(Constants.EXTRA_PHOTO_ID_INT, -1);
+        presenter.onNewPhotoId(photoId);
 
         detailImage = findViewById(R.id.image_detail);
         detailImage.setOnClickListener(v -> presenter.onImageClick());

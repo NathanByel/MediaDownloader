@@ -8,11 +8,10 @@ import android.widget.Toast;
 
 import com.arellomobile.mvp.MvpAppCompatActivity;
 import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
 
 import ru.nbdev.instagrammclient.Constants;
-import ru.nbdev.instagrammclient.presenter.MainPresenter;
 import ru.nbdev.instagrammclient.R;
+import ru.nbdev.instagrammclient.presenter.MainPresenter;
 import ru.nbdev.instagrammclient.view.detail.DetailActivity;
 
 public class MainActivity extends MvpAppCompatActivity implements MainView {
@@ -21,11 +20,6 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
 
     @InjectPresenter
     MainPresenter presenter;
-
-    @ProvidePresenter
-    MainPresenter provideMainPresenter() {
-        return new MainPresenter(getResources());
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,9 +38,9 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
     }
 
     @Override
-    public void runDetailActivity(String detailURL) {
+    public void runDetailActivity(int photoId) {
         Intent intent = new Intent(this, DetailActivity.class);
-        intent.putExtra(Constants.EXTRA_DETAIL_URL_STRING, detailURL);
+        intent.putExtra(Constants.EXTRA_PHOTO_ID_INT, photoId);
         startActivity(intent);
     }
 
@@ -56,7 +50,16 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
     }
 
     @Override
-    public void showMessage(String text) {
+    public void showMessage(int textId) {
+        showToast(getResources().getString(textId));
+    }
+
+    @Override
+    public void showPhotosCount(int count) {
+        showToast(getResources().getString(R.string.photos_count) + count);
+    }
+
+    private void showToast(String text) {
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
 }

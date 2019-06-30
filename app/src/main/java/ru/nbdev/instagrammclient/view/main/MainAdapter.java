@@ -8,9 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import ru.nbdev.instagrammclient.R;
 import ru.nbdev.instagrammclient.model.GlideLoader;
 import ru.nbdev.instagrammclient.presenter.RecyclerPresenter;
-import ru.nbdev.instagrammclient.R;
 
 public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
     private RecyclerPresenter recyclerPresenter;
