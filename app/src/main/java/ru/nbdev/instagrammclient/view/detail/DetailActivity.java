@@ -5,6 +5,7 @@ import android.widget.ImageView;
 
 import com.arellomobile.mvp.MvpAppCompatActivity;
 import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.github.chrisbanes.photoview.PhotoView;
 
 import ru.nbdev.instagrammclient.Constants;
 import ru.nbdev.instagrammclient.R;
@@ -13,7 +14,7 @@ import ru.nbdev.instagrammclient.presenter.DetailPresenter;
 
 public class DetailActivity extends MvpAppCompatActivity implements DetailView {
 
-    private ImageView detailImage;
+    private PhotoView detailImage;
     private GlideLoader glideLoader;
 
     @InjectPresenter
