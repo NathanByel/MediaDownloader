@@ -48,12 +48,13 @@ public class MainPresenter extends MvpPresenter<MainView> {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(photos -> {
-                    if (photos.size() == 0) {
+                    // TODO Надо придумать по каким правилам брать из базы или обновлять там данные, чтобы ссылки не протухали.
+                    //if (photos.size() == 0) {
                         loadPhotosListFromInternet();
-                    } else {
-                        photosList = photos;
-                        updateRecycler();
-                    }
+                    //} else {
+                    //    photosList = photos;
+                    //    updateRecycler();
+                    //}
                 }, throwable -> {
                     Log.e(TAG, "Not found. " + throwable.toString());
                 });
