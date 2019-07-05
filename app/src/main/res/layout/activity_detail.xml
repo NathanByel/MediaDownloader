@@ -6,7 +6,7 @@
     android:gravity="center_horizontal|center_vertical"
     tools:context=".view.detail.DetailActivity">
 
-    <ImageView
+    <com.github.chrisbanes.photoview.PhotoView
         android:id="@+id/image_detail"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

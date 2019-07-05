@@ -30,7 +30,7 @@ public class GlideLoader {
                 //.placeholder(circularProgressDrawable)
                 //.diskCacheStrategy(DiskCacheStrategy.NONE)
                 //.skipMemoryCache(true)
-                .centerCrop()
+                //.centerCrop()
                 .into(imageView);
     }
 }
