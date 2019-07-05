@@ -21,7 +21,8 @@ public class App extends Application {
         }
         LeakCanary.install(this);
 
-        crashlyticsInit();
+        // TODO Разобраться почему не работает размещение ключа в crashlytics.properties
+        //crashlyticsInit();
         appComponent = generateAppComponent();
     }
 

@@ -2,4 +2,5 @@
     <string name="app_name">InstagrammClient</string>
     <string name="load_error">Load error</string>
     <string name="photos_count">Photos count:</string>
+    <string name="search">Поиск</string>
 </resources>
