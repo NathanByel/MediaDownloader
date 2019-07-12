@@ -13,6 +13,7 @@ import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import ru.nbdev.instagrammclient.PixabaySearchFilter;
 import ru.nbdev.instagrammclient.R;
 import ru.nbdev.instagrammclient.app.App;
 import ru.nbdev.instagrammclient.model.entity.Photo;
@@ -26,9 +27,8 @@ public class MainPresenter extends MvpPresenter<MainView> {
     private static final String TAG = "MainPresenter";
     private RecyclerPresenter recyclerPresenter;
     private List<Photo> photosList;
-
-    @Inject
-    PixabayApiHelper pixabayApiHelper;
+    private PixabayApiHelper pixabayApiHelper;
+    private PixabaySearchFilter pixabaySearchFilter;
 
     @Inject
     AppDatabase database;
@@ -36,6 +36,28 @@ public class MainPresenter extends MvpPresenter<MainView> {
     public MainPresenter() {
         App.getAppComponent().inject(this);
         recyclerPresenter = new RecyclerPresenter();
+        pixabayApiHelper = new PixabayApiHelper();
+        pixabaySearchFilter = new PixabaySearchFilter();
+    }
+
+    public void onRefresh() {
+        clearRecycler();
+        loadPhotosList();
+    }
+
+    public void onSearch(String query) {
+        clearRecycler();
+        searchPhotos(query, pixabaySearchFilter);
+    }
+
+    public void onFiltersOpened() {
+        getViewState().fillFilterFields(pixabaySearchFilter);
+    }
+
+    public void onFiltersClosed(int orderId, int typeId, int categoryId) {
+        pixabaySearchFilter.setSelectedOrderById(orderId);
+        pixabaySearchFilter.setSelectedImageTypeById(typeId);
+        pixabaySearchFilter.setSelectedCategoryById(categoryId);
     }
 
     @Override
@@ -61,7 +83,20 @@ public class MainPresenter extends MvpPresenter<MainView> {
     }
 
     private void loadPhotosListFromInternet() {
-        Disposable disposable = pixabayApiHelper.requestPhotosList()
+        Disposable disposable = pixabayApiHelper.requestRandomPhotosList()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(photos -> {
+                    photosList = photos.hits;
+                    savePhotosListToDatabase();
+                    updateRecycler();
+                }, throwable -> {
+                    Log.e(TAG, "onError " + throwable);
+                    getViewState().showMessage(R.string.load_error);
+                });
+    }
+
+    private void searchPhotos(String query, PixabaySearchFilter filter) {
+        Disposable disposable = pixabayApiHelper.requestPhotosList(query, filter)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(photos -> {
                     photosList = photos.hits;
@@ -88,6 +123,11 @@ public class MainPresenter extends MvpPresenter<MainView> {
             getViewState().showPhotosCount(photosList.size());
             getViewState().updateRecyclerView();
         }
+    }
+
+    private void clearRecycler() {
+        photosList.clear();
+        getViewState().updateRecyclerView();
     }
 
     public RecyclerPresenter getRecyclerPresenter() {

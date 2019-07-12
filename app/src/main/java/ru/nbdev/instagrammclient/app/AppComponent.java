@@ -3,6 +3,7 @@ package ru.nbdev.instagrammclient.app;
 import javax.inject.Singleton;
 
 import dagger.Component;
+import ru.nbdev.instagrammclient.model.retrofit.PixabayApiHelper;
 import ru.nbdev.instagrammclient.presenter.DetailPresenter;
 import ru.nbdev.instagrammclient.presenter.MainPresenter;
 
@@ -12,4 +13,6 @@ public interface AppComponent {
     void inject(MainPresenter mainPresenter);
 
     void inject(DetailPresenter detailPresenter);
+
+    void inject(PixabayApiHelper pixabayApiHelper);
 }

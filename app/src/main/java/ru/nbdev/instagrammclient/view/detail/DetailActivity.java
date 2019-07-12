@@ -1,7 +1,6 @@
 package ru.nbdev.instagrammclient.view.detail;
 
 import android.os.Bundle;
-import android.widget.ImageView;
 
 import com.arellomobile.mvp.MvpAppCompatActivity;
 import com.arellomobile.mvp.presenter.InjectPresenter;
