@@ -25,7 +25,7 @@ import ru.nbdev.instagrammclient.view.main.MainView;
 @InjectViewState
 public class MainPresenter extends MvpPresenter<MainView> {
     private static final String TAG = "MainPresenter";
-    private RecyclerPresenter recyclerPresenter;
+    private MainRecyclerPresenter mainRecyclerPresenter;
     private List<Photo> photosList;
     private PixabayApiHelper pixabayApiHelper;
     private PixabaySearchFilter pixabaySearchFilter;
@@ -35,14 +35,14 @@ public class MainPresenter extends MvpPresenter<MainView> {
 
     public MainPresenter() {
         App.getAppComponent().inject(this);
-        recyclerPresenter = new RecyclerPresenter();
+        mainRecyclerPresenter = new MainRecyclerPresenter();
         pixabayApiHelper = new PixabayApiHelper();
         pixabaySearchFilter = new PixabaySearchFilter();
     }
 
     public void onRefresh() {
         clearRecycler();
-        loadPhotosList();
+        loadPhotosListFromInternet();
     }
 
     public void onSearch(String query) {
@@ -126,15 +126,17 @@ public class MainPresenter extends MvpPresenter<MainView> {
     }
 
     private void clearRecycler() {
-        photosList.clear();
-        getViewState().updateRecyclerView();
+        if (photosList != null) {
+            photosList.clear();
+            getViewState().updateRecyclerView();
+        }
     }
 
-    public RecyclerPresenter getRecyclerPresenter() {
-        return recyclerPresenter;
+    public MainRecyclerPresenter getMainRecyclerPresenter() {
+        return mainRecyclerPresenter;
     }
 
-    private class RecyclerPresenter implements ru.nbdev.instagrammclient.presenter.RecyclerPresenter {
+    private class MainRecyclerPresenter implements RecyclerPresenter {
         @Override
         public int getItemCount() {
             if (photosList != null) {
@@ -144,10 +146,10 @@ public class MainPresenter extends MvpPresenter<MainView> {
         }
 
         @Override
-        public void bindView(MainAdapter.MainViewHolder mainViewHolder) {
-            Photo photo = photosList.get(mainViewHolder.getAdapterPosition());
-            mainViewHolder.setImage(photo.previewURL);
-            mainViewHolder.setOnClickListener(v -> onItemClick(photo.id));
+        public void bindView(MainAdapter.MainRecyclerViewHolder mainRecyclerViewHolder) {
+            Photo photo = photosList.get(mainRecyclerViewHolder.getAdapterPosition());
+            mainRecyclerViewHolder.setPhotoData(photo);
+            mainRecyclerViewHolder.setOnClickListener(v -> onItemClick(photo.id));
         }
 
         @Override

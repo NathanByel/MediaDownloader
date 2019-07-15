@@ -152,7 +152,7 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, Swip
         RecyclerView recyclerView = findViewById(R.id.main_recycler);
         GridLayoutManager layoutManager = new GridLayoutManager(this, RECYCLER_COLUMNS);
         recyclerView.setLayoutManager(layoutManager);
-        mainAdapter = new MainAdapter(this, presenter.getRecyclerPresenter());
+        mainAdapter = new MainAdapter(this, presenter.getMainRecyclerPresenter());
         recyclerView.setAdapter(mainAdapter);
     }
 

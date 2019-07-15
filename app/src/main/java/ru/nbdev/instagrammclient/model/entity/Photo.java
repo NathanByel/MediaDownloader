@@ -15,6 +15,14 @@ public class Photo {
     public int id;
 
     @Expose
+    @SerializedName("type")
+    public String type;
+
+    @Expose
+    @SerializedName("previewURL")
+    public String previewURL;
+
+    @Expose
     @SerializedName("webformatURL")
     public String webformatURL;
 
@@ -23,10 +31,22 @@ public class Photo {
     public String largeImageURL;
 
     @Expose
-    @SerializedName("previewURL")
-    public String previewURL;
+    @SerializedName("fullHDURL")
+    public String fullHdURL;
+
+    @Expose
+    @SerializedName("imageURL")
+    public String imageURL;
 
     @Expose
     @SerializedName("likes")
     public int likes;
+
+    @Expose
+    @SerializedName("downloads")
+    public int downloads;
+
+    @Expose
+    @SerializedName("views")
+    public int views;
 }

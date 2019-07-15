@@ -3,4 +3,5 @@
     <string name="load_error">Load error</string>
     <string name="photos_count">Photos count:</string>
     <string name="search">Поиск</string>
+    <string name="mock_text">Text</string>
 </resources>
