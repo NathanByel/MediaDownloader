@@ -5,7 +5,7 @@ import ru.nbdev.instagrammclient.view.main.MainAdapter;
 public interface RecyclerPresenter {
     int getItemCount();
 
-    void bindView(MainAdapter.MainViewHolder mainViewHolder);
+    void bindView(MainAdapter.MainRecyclerViewHolder mainRecyclerViewHolder);
 
     void onItemClick(int photoId);
 }
