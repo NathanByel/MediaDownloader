@@ -1,7 +1,10 @@
 <resources>
     <string name="app_name">InstagrammClient</string>
-    <string name="load_error">Load error</string>
-    <string name="photos_count">Photos count:</string>
+    <string name="load_error">Ошибка загрузки!</string>
+    <string name="photos_count">Найдено:</string>
     <string name="search">Поиск</string>
     <string name="mock_text">Text</string>
+    <string name="send_url">Отправить ссылку</string>
+    <string name="save_error">Ошибка сохранения</string>
+    <string name="saved_to">Сохранено в</string>
 </resources>

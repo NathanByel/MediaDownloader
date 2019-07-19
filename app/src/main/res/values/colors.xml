@@ -3,6 +3,7 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
-    <color name="recycler_item_bottom_panel_color">#CC2F021E</color>
+    <!-- <color name="shadow_panel_color">#B3000000</color> -->
+    <color name="shadow_panel_color">#B300574B</color>
     <color name="recycler_item_bottom_color">#B3FFFFFF</color>
 </resources>

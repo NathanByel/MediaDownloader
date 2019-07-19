@@ -10,7 +10,7 @@ import javax.inject.Inject;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import ru.nbdev.instagrammclient.app.App;
+import ru.nbdev.instagrammclient.model.entity.Photo;
 import ru.nbdev.instagrammclient.model.room.AppDatabase;
 import ru.nbdev.instagrammclient.view.detail.DetailView;
 
@@ -19,32 +19,51 @@ public class DetailPresenter extends MvpPresenter<DetailView> {
     private static final String TAG = "DetailPresenter";
 
     private int photoId;
+    private Photo photo;
 
     @Inject
     AppDatabase database;
 
-    public DetailPresenter() {
-        App.getAppComponent().inject(this);
-    }
-
-    public void onNewPhotoId(int photoId) {
+    public DetailPresenter(int photoId) {
         this.photoId = photoId;
     }
 
-    public void onImageClick() {
+    public void onSaveClick() {
         Log.d(TAG, "Photo ID = " + photoId);
+        getViewState().checkWriteStoragePermissions();
     }
 
     @Override
     protected void onFirstViewAttach() {
-        if (photoId > -1) {
-            Disposable disposable = database.pixabayDao().getPhotoById(photoId)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            photo -> getViewState().setDetailPhoto(photo.largeImageURL),
-                            throwable -> Log.e(TAG, "Error, " + throwable)
-                    );
+        if (photo == null) {
+            loadPhotoFromDb();
+        } else {
+            getViewState().showPhoto(photo);
+        }
+    }
+
+    private void loadPhotoFromDb() {
+        Disposable disposable = database.pixabayDao().getPhotoById(photoId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        photo -> {
+                            this.photo = photo;
+                            getViewState().showPhoto(photo);
+                        },
+                        throwable -> Log.e(TAG, "Error, " + throwable)
+                );
+    }
+
+    public void onWriteStoragePermissionGranted() {
+        if (photo != null) {
+            getViewState().savePhoto(photo);
+        }
+    }
+
+    public void onShareClick() {
+        if (photo != null) {
+            getViewState().sharePhoto(photo);
         }
     }
 }

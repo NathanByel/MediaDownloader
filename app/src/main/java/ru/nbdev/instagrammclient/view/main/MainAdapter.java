@@ -61,7 +61,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainRecyclerVi
         }
 
         public void setPhotoData(Photo photo) {
-            glideLoader.loadImage(photo.previewURL, imageView);
+            glideLoader.loadImage(photo.previewURL, imageView, null);
 
             viewsTextView.setText( formatNumberToString(photo.views) );
             likesTextView.setText( formatNumberToString(photo.likes) );
