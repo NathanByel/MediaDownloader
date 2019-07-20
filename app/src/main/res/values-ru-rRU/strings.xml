@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="grant">РАЗРЕШИТЬ</string>
+    <string name="load_error">Ошибка загрузки!</string>
+    <string name="mock_text">Текст</string>
+    <string name="saved_to">Сохранено в</string>
+    <string name="search">Поиск</string>
+    <string name="send_url">Отправить ссылку</string>
+    <string name="storage_permission_needed">Нужны разрешения для сохранения файла</string>
+    <string name="save_error">Ошибка сохранения</string>
+    <string name="photos_count">Найдено:</string>
+</resources>

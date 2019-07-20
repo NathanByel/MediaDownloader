@@ -1,6 +1,12 @@
 <resources>
-    <string name="app_name">InstagrammClient</string>
-    <string name="load_error">Load error</string>
-    <string name="photos_count">Photos count:</string>
-    <string name="search">Поиск</string>
+    <string name="app_name" translatable="false">InstagrammClient</string>
+    <string name="photos_count">Found:</string>
+    <string name="search">Search</string>
+    <string name="mock_text">Text</string>
+    <string name="send_url">Send link</string>
+    <string name="save_error">Save error</string>
+    <string name="saved_to">Saved to</string>
+    <string name="storage_permission_needed">Storage permission is needed to save files</string>
+    <string name="grant">GRANT</string>
+    <string name="load_error">Load error!</string>
 </resources>

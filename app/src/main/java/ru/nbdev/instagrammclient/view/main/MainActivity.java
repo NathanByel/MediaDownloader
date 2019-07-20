@@ -1,7 +1,5 @@
 package ru.nbdev.instagrammclient.view.main;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetDialog;
@@ -11,8 +9,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -23,13 +19,13 @@ import com.arellomobile.mvp.MvpAppCompatActivity;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 
 import ru.nbdev.instagrammclient.Constants;
+import ru.nbdev.instagrammclient.Helpers;
 import ru.nbdev.instagrammclient.PixabaySearchFilter;
 import ru.nbdev.instagrammclient.R;
 import ru.nbdev.instagrammclient.presenter.MainPresenter;
 import ru.nbdev.instagrammclient.view.detail.DetailActivity;
 
 public class MainActivity extends MvpAppCompatActivity implements MainView, SwipeRefreshLayout.OnRefreshListener {
-    private static final int RECYCLER_COLUMNS = 2;
     private MainAdapter mainAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
 
@@ -54,14 +50,14 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, Swip
     private void searchBarInit() {
         ImageView searchBarStartIcon = findViewById(R.id.search_bar_start_icon);
         ImageView searchBarFilterIcon = findViewById(R.id.search_bar_filter_icon);
-        EditText editText = findViewById(R.id.search_bar_edit_text);
+        EditText editSearchQuery = findViewById(R.id.search_bar_query_edit);
 
         searchBarStartIcon.setOnClickListener(v -> {
-            editText.clearFocus();
-            hideKeyboard(MainActivity.this);
+            editSearchQuery.clearFocus();
+            Helpers.hideKeyboard(MainActivity.this);
         });
 
-        editText.setOnFocusChangeListener((v, hasFocus) -> {
+        editSearchQuery.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) {
                 searchBarStartIcon.setImageResource(R.drawable.ic_arrow_back_black_24dp);
             } else {
@@ -69,13 +65,13 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, Swip
             }
         });
 
-        editText.setOnKeyListener((v, keyCode, event) -> {
+        editSearchQuery.setOnKeyListener((v, keyCode, event) -> {
             if (event.getAction() == KeyEvent.ACTION_DOWN &&
                     (keyCode == KeyEvent.KEYCODE_ENTER)) {
 
-                editText.clearFocus();
-                hideKeyboard(MainActivity.this);
-                presenter.onSearch(editText.getText().toString());
+                editSearchQuery.clearFocus();
+                Helpers.hideKeyboard(MainActivity.this);
+                presenter.onSearch(editSearchQuery.getText().toString());
                 return true;
             }
             return false;
@@ -150,9 +146,9 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, Swip
 
     private void recyclerInit() {
         RecyclerView recyclerView = findViewById(R.id.main_recycler);
-        GridLayoutManager layoutManager = new GridLayoutManager(this, RECYCLER_COLUMNS);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, Constants.RECYCLER_COLUMNS);
         recyclerView.setLayoutManager(layoutManager);
-        mainAdapter = new MainAdapter(this, presenter.getRecyclerPresenter());
+        mainAdapter = new MainAdapter(this, presenter.getMainRecyclerPresenter());
         recyclerView.setAdapter(mainAdapter);
     }
 
@@ -187,22 +183,5 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, Swip
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(false);
         presenter.onRefresh();
-    }
-
-
-    public static void hideKeyboard(Activity activity) {
-        if (activity != null) {
-
-            // Check if no view has focus
-            View view = activity.getCurrentFocus();
-            if (view != null) {
-                InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-                if (imm != null) {
-                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                }
-            } else {
-                activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-            }
-        }
     }
 }

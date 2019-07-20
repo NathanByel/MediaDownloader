@@ -1,6 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/recycler_image"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:scaleType="centerCrop"/>
+    android:layout_height="200dp">
+
+    <ImageView
+        android:id="@+id/recycler_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        tools:ignore="ContentDescription" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:background="@drawable/gradient_recycler_item_bottom"
+        android:gravity="end"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:id="@+id/text_view_views"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.4"
+            android:drawableStart="@drawable/ic_eye_24dp"
+            android:drawablePadding="4dp"
+            android:singleLine="true"
+            android:textColor="@color/recycler_item_bottom_color"
+            android:textSize="18sp"
+            tools:text="@string/mock_text" />
+
+        <TextView
+            android:id="@+id/text_view_likes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableStart="@drawable/ic_thumb_up_24dp"
+            android:drawablePadding="4dp"
+            android:singleLine="true"
+            android:textColor="@color/recycler_item_bottom_color"
+            android:textSize="18sp"
+            tools:text="@string/mock_text" />
+    </LinearLayout>
+
+</FrameLayout>
