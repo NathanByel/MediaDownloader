@@ -1,5 +1,7 @@
 package ru.nbdev.instagrammclient.view.detail;
 
+import android.support.annotation.StringRes;
+
 import com.arellomobile.mvp.MvpView;
 
 import ru.nbdev.instagrammclient.model.entity.Photo;
@@ -13,5 +15,5 @@ public interface DetailView extends MvpView {
 
     void checkWriteStoragePermissions();
 
-    void showMessage(String path);
+    void showMessage(@StringRes int textId);
 }

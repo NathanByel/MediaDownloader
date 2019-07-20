@@ -31,13 +31,13 @@ import ru.nbdev.instagrammclient.presenter.DetailPresenter;
 public class DetailActivity extends MvpAppCompatActivity implements DetailView {
     private static final int REQUEST_WRITE_EXTERNAL_STORAGE = 123;
 
-    private PhotoView detailImage;
-    private LinearLayout topPanelLayout;
+    private PhotoView photoView;
+    private LinearLayout layoutTopPanel;
     private ImageView iconDownload;
     private ImageView iconShare;
     private ImageView imageStatus;
 
-    private Animation buttonsAnimation;
+    private Animation animationZoomInOut;
     private GlideLoader glideLoader;
 
     @InjectPresenter
@@ -62,35 +62,35 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
         setupListeners();
 
         glideLoader = new GlideLoader(this);
-        setTopPanelVisibility(false);
+        setLoadMode();
     }
 
     private void setupListeners() {
         iconDownload.setOnClickListener(v -> {
-            iconDownload.startAnimation(buttonsAnimation);
+            iconDownload.startAnimation(animationZoomInOut);
             presenter.onSaveClick();
         });
 
         iconShare.setOnClickListener(v -> {
-            iconShare.startAnimation(buttonsAnimation);
+            iconShare.startAnimation(animationZoomInOut);
             presenter.onShareClick();
         });
     }
 
     private void initViews() {
-        imageStatus = findViewById(R.id.detail_image_status);
-        topPanelLayout = findViewById(R.id.detail_top_panel);
-        iconDownload = findViewById(R.id.detail_download_icon);
-        iconShare = findViewById(R.id.detail_share_icon);
-        detailImage = findViewById(R.id.detail_image);
+        imageStatus = findViewById(R.id.imageview_detail_status);
+        layoutTopPanel = findViewById(R.id.linearlayout_detail_toppanel);
+        iconDownload = findViewById(R.id.icon_detail_download);
+        iconShare = findViewById(R.id.icon_detail_share);
+        photoView = findViewById(R.id.photoview_detail_photo);
     }
 
     private void initAnimations() {
-        buttonsAnimation = AnimationUtils.loadAnimation(DetailActivity.this, R.anim.scale_zoom_in_out);
+        animationZoomInOut = AnimationUtils.loadAnimation(DetailActivity.this, R.anim.animation_zoom_in_out);
     }
 
     private void setTopPanelVisibility(boolean visibility) {
-        topPanelLayout.setVisibility(visibility ? View.VISIBLE : View.INVISIBLE);
+        layoutTopPanel.setVisibility(visibility ? View.VISIBLE : View.INVISIBLE);
     }
 
     private void requestWriteStoragePermission() {
@@ -99,26 +99,38 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
         }
     }
 
+    private void setLoadMode() {
+        setTopPanelVisibility(false);
+        photoView.setVisibility(View.INVISIBLE);
+        imageStatus.setImageResource(R.drawable.icon_progress_animated);
+        imageStatus.setVisibility(View.VISIBLE);
+    }
+
+    private void setErrorMode(String text) {
+        setTopPanelVisibility(false);
+        photoView.setVisibility(View.INVISIBLE);
+        imageStatus.setImageResource(R.drawable.ic_error_outline_48dp);
+        showToast(text);
+    }
+
+    private void setPhotoMode() {
+        setTopPanelVisibility(true);
+        imageStatus.setVisibility(View.INVISIBLE);
+        photoView.setVisibility(View.VISIBLE);
+    }
+
     @Override
     public void showPhoto(Photo photo) {
-        setTopPanelVisibility(false);
-        detailImage.setVisibility(View.INVISIBLE);
-        imageStatus.setImageResource(R.drawable.progress_animation);
-        imageStatus.setVisibility(View.VISIBLE);
-
-        glideLoader.loadImage(photo.largeImageURL, detailImage, new GlideLoader.OnImageLoadedListener() {
+        setLoadMode();
+        glideLoader.loadImage(photo.largeImageURL, photoView, new GlideLoader.OnImageLoadedListener() {
             @Override
             public void onError() {
-                setTopPanelVisibility(false);
-                imageStatus.setImageResource(R.drawable.ic_error_outline_48dp);
-                showMessage(getResources().getString(R.string.load_error));
+                setErrorMode(getResources().getString(R.string.load_error));
             }
 
             @Override
             public void onSuccess() {
-                imageStatus.setVisibility(View.INVISIBLE);
-                detailImage.setVisibility(View.VISIBLE);
-                setTopPanelVisibility(true);
+                setPhotoMode();
             }
         });
     }
@@ -131,12 +143,12 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
         glideLoader.saveImage(photo.largeImageURL, saveFileName, new GlideLoader.OnImageSavedListener() {
             @Override
             public void onError() {
-                runOnUiThread(() -> showMessage(getResources().getString(R.string.save_error)));
+                runOnUiThread(() -> showToast(getResources().getString(R.string.save_error)));
             }
 
             @Override
             public void onSuccess(File file) {
-                runOnUiThread(() -> showMessage(getResources().getString(R.string.saved_to) + " " + file.toString()));
+                runOnUiThread(() -> showToast(getResources().getString(R.string.saved_to) + " " + file.toString()));
             }
         });
     }
@@ -148,9 +160,9 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
                 presenter.onWriteStoragePermissionGranted();
             } else {
                 if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    final String message = "Storage permission is needed to save files";
-                    Snackbar.make(detailImage, message, Snackbar.LENGTH_LONG)
-                            .setAction("GRANT", v -> requestWriteStoragePermission())
+                    final String message = getResources().getString(R.string.storage_permission_needed);
+                    Snackbar.make(photoView, message, Snackbar.LENGTH_LONG)
+                            .setAction(getResources().getString(R.string.grant), v -> requestWriteStoragePermission())
                             .show();
                 } else {
                     requestWriteStoragePermission();
@@ -164,15 +176,12 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
         if (requestCode == REQUEST_WRITE_EXTERNAL_STORAGE && grantResults.length == 1) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 presenter.onWriteStoragePermissionGranted();
+            } else {
+                showToast(getResources().getString(R.string.storage_permission_needed));
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
-    }
-
-    @Override
-    public void showMessage(String text) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -184,5 +193,14 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
         share.putExtra(Intent.EXTRA_TEXT, photo.largeImageURL);
 
         startActivity(Intent.createChooser(share, getResources().getString(R.string.send_url)));
+    }
+
+    @Override
+    public void showMessage(int textId) {
+        showToast(getResources().getString(textId));
+    }
+
+    public void showToast(String text) {
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
 }

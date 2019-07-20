@@ -37,7 +37,7 @@ public class GlideLoader {
                         if (listener != null) {
                             listener.onError();
                         }
-                        return true;
+                        return false;
                     }
 
                     @Override
@@ -45,7 +45,7 @@ public class GlideLoader {
                         if (listener != null) {
                             listener.onSuccess();
                         }
-                        return true;
+                        return false;
                     }
                 })
                 .into(imageView);

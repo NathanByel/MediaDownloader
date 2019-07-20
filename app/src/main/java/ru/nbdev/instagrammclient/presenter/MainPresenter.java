@@ -25,6 +25,7 @@ import ru.nbdev.instagrammclient.view.main.MainView;
 @InjectViewState
 public class MainPresenter extends MvpPresenter<MainView> {
     private static final String TAG = "MainPresenter";
+
     private MainRecyclerPresenter mainRecyclerPresenter;
     private List<Photo> photosList;
     private PixabayApiHelper pixabayApiHelper;

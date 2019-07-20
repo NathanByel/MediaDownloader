@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import ru.nbdev.instagrammclient.R;
 import ru.nbdev.instagrammclient.model.entity.Photo;
 import ru.nbdev.instagrammclient.model.room.AppDatabase;
 import ru.nbdev.instagrammclient.view.detail.DetailView;
@@ -51,19 +52,26 @@ public class DetailPresenter extends MvpPresenter<DetailView> {
                             this.photo = photo;
                             getViewState().showPhoto(photo);
                         },
-                        throwable -> Log.e(TAG, "Error, " + throwable)
+                        throwable -> {
+                            Log.e(TAG, "Error, " + throwable);
+                            getViewState().showMessage(R.string.load_error);
+                        }
                 );
     }
 
     public void onWriteStoragePermissionGranted() {
         if (photo != null) {
             getViewState().savePhoto(photo);
+        } else {
+            getViewState().showMessage(R.string.load_error);
         }
     }
 
     public void onShareClick() {
         if (photo != null) {
             getViewState().sharePhoto(photo);
+        } else {
+            getViewState().showMessage(R.string.load_error);
         }
     }
 }
