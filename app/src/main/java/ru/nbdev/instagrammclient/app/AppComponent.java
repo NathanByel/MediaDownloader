@@ -10,6 +10,7 @@ import ru.nbdev.instagrammclient.presenter.MainPresenter;
 @Singleton
 @Component(modules = {AppModule.class})
 public interface AppComponent {
+
     void inject(MainPresenter mainPresenter);
 
     void inject(DetailPresenter detailPresenter);

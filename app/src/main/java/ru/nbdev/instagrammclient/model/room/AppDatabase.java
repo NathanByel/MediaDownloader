@@ -7,5 +7,6 @@ import ru.nbdev.instagrammclient.model.entity.Photo;
 
 @Database(entities = {Photo.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
+
     public abstract PixabayDao pixabayDao();
 }

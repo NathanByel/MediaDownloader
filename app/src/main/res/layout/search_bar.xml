@@ -10,14 +10,14 @@
     android:padding="2dp">
 
     <ImageView
-        android:id="@+id/search_bar_start_icon"
+        android:id="@+id/icon_search_bar_start"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:src="@drawable/ic_search_black_24dp" />
 
     <EditText
-        android:id="@+id/search_bar_query_edit"
+        android:id="@+id/edit_search_bar_query"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0.2"
@@ -27,7 +27,7 @@
         android:singleLine="true" />
 
     <ImageView
-        android:id="@+id/search_bar_filter_icon"
+        android:id="@+id/icon_search_bar_filter"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"

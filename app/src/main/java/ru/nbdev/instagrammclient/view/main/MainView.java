@@ -6,10 +6,11 @@ import com.arellomobile.mvp.MvpView;
 import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 
-import ru.nbdev.instagrammclient.PixabaySearchFilter;
+import ru.nbdev.instagrammclient.presenter.PixabaySearchFilter;
 
 @StateStrategyType(SkipStrategy.class)
 public interface MainView extends MvpView {
+
     void runDetailActivity(int photoId);
 
     void updateRecyclerView();
@@ -18,5 +19,5 @@ public interface MainView extends MvpView {
 
     void showPhotosCount(int count);
 
-    void fillFilterFields(PixabaySearchFilter filter);
+    void showFilterDialog(PixabaySearchFilter filter);
 }

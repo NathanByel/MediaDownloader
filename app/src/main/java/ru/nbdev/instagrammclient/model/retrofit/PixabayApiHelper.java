@@ -4,12 +4,12 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
-import ru.nbdev.instagrammclient.PixabaySearchFilter;
+import ru.nbdev.instagrammclient.BuildConfig;
+import ru.nbdev.instagrammclient.presenter.PixabaySearchFilter;
 import ru.nbdev.instagrammclient.app.App;
 import ru.nbdev.instagrammclient.model.entity.PhotosList;
 
 public class PixabayApiHelper {
-    private static final String API_KEY = "12680892-c0359658b65c6d9678e07788e";
 
     @Inject
     PixabayApiService api;
@@ -19,12 +19,12 @@ public class PixabayApiHelper {
     }
 
     public Observable<PhotosList> requestRandomPhotosList() {
-        return api.getPhotosList(API_KEY, 200).subscribeOn(Schedulers.io());
+        return api.getPhotosList(BuildConfig.PIXABAY_API_KEY, 200).subscribeOn(Schedulers.io());
     }
 
     public Observable<PhotosList> requestPhotosList(String query, PixabaySearchFilter filter) {
         return api.getPhotosList(
-                API_KEY,
+                BuildConfig.PIXABAY_API_KEY,
                 query,
                 filter.getSelectedImageTypeKey(),
                 filter.getSelectedCategoryKey(),

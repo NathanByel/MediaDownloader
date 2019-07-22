@@ -17,6 +17,7 @@ import ru.nbdev.instagrammclient.view.detail.DetailView;
 
 @InjectViewState
 public class DetailPresenter extends MvpPresenter<DetailView> {
+
     private static final String TAG = "DetailPresenter";
 
     private int photoId;

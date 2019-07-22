@@ -9,4 +9,31 @@
     <string name="storage_permission_needed">Storage permission is needed to save files</string>
     <string name="grant">GRANT</string>
     <string name="load_error">Load error!</string>
+
+    <string name="filter_popular">Popular</string>
+    <string name="filter_latest">Latest</string>
+    <string name="filter_all">All</string>
+    <string name="filter_photo">Photo</string>
+    <string name="filter_illustration">Illustration</string>
+    <string name="filter_vector">Vector</string>
+    <string name="filter_fashion">Fashion</string>
+    <string name="filter_nature">Nature</string>
+    <string name="filter_backgrounds">Backgrounds</string>
+    <string name="filter_science">Science</string>
+    <string name="filter_education">Education</string>
+    <string name="filter_people">People</string>
+    <string name="filter_feelings">Feelings</string>
+    <string name="filter_religion">Religion</string>
+    <string name="filter_health">Health</string>
+    <string name="filter_places">Places</string>
+    <string name="filter_animals">Animals</string>
+    <string name="filter_industry">Industry</string>
+    <string name="filter_food">Food</string>
+    <string name="filter_computer">Computer</string>
+    <string name="filter_sports">Sports</string>
+    <string name="filter_transportation">Transportation</string>
+    <string name="filter_travel">Travel</string>
+    <string name="filter_buildings">Buildings</string>
+    <string name="filter_business">Business</string>
+    <string name="filter_music">Music</string>
 </resources>

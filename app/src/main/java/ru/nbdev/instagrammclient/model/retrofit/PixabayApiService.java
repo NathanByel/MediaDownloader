@@ -6,6 +6,7 @@ import retrofit2.http.Query;
 import ru.nbdev.instagrammclient.model.entity.PhotosList;
 
 public interface PixabayApiService {
+
     @GET("api")
     Observable<PhotosList> getPhotosList(
             @Query("key") String key,
