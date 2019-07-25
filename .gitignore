@@ -15,3 +15,5 @@
 
 
 /app/crashlytics.properties
+/app/fabric.properties
+/app/gradle.properties

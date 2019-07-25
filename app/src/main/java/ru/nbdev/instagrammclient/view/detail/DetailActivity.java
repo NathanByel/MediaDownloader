@@ -21,7 +21,7 @@ import com.github.chrisbanes.photoview.PhotoView;
 
 import java.io.File;
 
-import ru.nbdev.instagrammclient.Constants;
+import ru.nbdev.instagrammclient.model.Constants;
 import ru.nbdev.instagrammclient.R;
 import ru.nbdev.instagrammclient.app.App;
 import ru.nbdev.instagrammclient.model.GlideLoader;
@@ -29,7 +29,6 @@ import ru.nbdev.instagrammclient.model.entity.Photo;
 import ru.nbdev.instagrammclient.presenter.DetailPresenter;
 
 public class DetailActivity extends MvpAppCompatActivity implements DetailView {
-    private static final int REQUEST_WRITE_EXTERNAL_STORAGE = 123;
 
     private PhotoView photoView;
     private LinearLayout layoutTopPanel;
@@ -57,7 +56,7 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        initViews();
+        findViews();
         initAnimations();
         setupListeners();
 
@@ -77,7 +76,7 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
         });
     }
 
-    private void initViews() {
+    private void findViews() {
         imageStatus = findViewById(R.id.imageview_detail_status);
         layoutTopPanel = findViewById(R.id.linearlayout_detail_toppanel);
         iconDownload = findViewById(R.id.icon_detail_download);
@@ -95,7 +94,7 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
 
     private void requestWriteStoragePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_EXTERNAL_STORAGE);
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_EXTERNAL_STORAGE);
         }
     }
 
@@ -173,7 +172,7 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_WRITE_EXTERNAL_STORAGE && grantResults.length == 1) {
+        if (requestCode == Constants.REQUEST_WRITE_EXTERNAL_STORAGE && grantResults.length == 1) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 presenter.onWriteStoragePermissionGranted();
             } else {

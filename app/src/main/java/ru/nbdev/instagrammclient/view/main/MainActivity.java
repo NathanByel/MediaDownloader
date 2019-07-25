@@ -17,17 +17,32 @@ import android.widget.Toast;
 
 import com.arellomobile.mvp.MvpAppCompatActivity;
 import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
 
-import ru.nbdev.instagrammclient.Constants;
-import ru.nbdev.instagrammclient.Helpers;
-import ru.nbdev.instagrammclient.PixabaySearchFilter;
+import ru.nbdev.instagrammclient.model.Constants;
+import ru.nbdev.instagrammclient.model.Helpers;
+import ru.nbdev.instagrammclient.presenter.PixabaySearchFilter;
 import ru.nbdev.instagrammclient.R;
+import ru.nbdev.instagrammclient.app.App;
 import ru.nbdev.instagrammclient.presenter.MainPresenter;
 import ru.nbdev.instagrammclient.view.detail.DetailActivity;
 
 public class MainActivity extends MvpAppCompatActivity implements MainView, SwipeRefreshLayout.OnRefreshListener {
+
+    private Toolbar toolbar;
+    private RecyclerView recyclerView;
     private MainAdapter mainAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
+
+    private View bottomSheet;
+    private ImageView searchBarStartIcon;
+    private ImageView searchBarFilterIcon;
+    private EditText editSearchQuery;
+
+    private BottomSheetDialog filterDialog;
+    private ArrayAdapter<String> orderFilterAdapter;
+    private ArrayAdapter<String> imageTypeFilterAdapter;
+    private ArrayAdapter<String> categoryFilterAdapter;
 
     private Spinner orderFilterSpinner;
     private Spinner imageTypeFilterSpinner;
@@ -36,120 +51,136 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, Swip
     @InjectPresenter
     MainPresenter presenter;
 
+    @ProvidePresenter
+    MainPresenter provideMainPresenter() {
+        MainPresenter mainPresenter = new MainPresenter();
+        App.getAppComponent().inject(mainPresenter);
+        return mainPresenter;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        findViews();
         toolbarInit();
-        searchBarInit();
-        swipeRefreshInit();
         recyclerInit();
+        initFilters();
+        setupListeners();
     }
 
-    private void searchBarInit() {
-        ImageView searchBarStartIcon = findViewById(R.id.search_bar_start_icon);
-        ImageView searchBarFilterIcon = findViewById(R.id.search_bar_filter_icon);
-        EditText editSearchQuery = findViewById(R.id.search_bar_query_edit);
+    private void findViews() {
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout_main);
+        toolbar = findViewById(R.id.toolbar_main);
+        recyclerView = findViewById(R.id.recycler_main);
 
-        searchBarStartIcon.setOnClickListener(v -> {
-            editSearchQuery.clearFocus();
-            Helpers.hideKeyboard(MainActivity.this);
-        });
+        searchBarStartIcon = findViewById(R.id.icon_search_bar_start);
+        searchBarFilterIcon = findViewById(R.id.icon_search_bar_filter);
+        editSearchQuery = findViewById(R.id.edit_search_bar_query);
+
+        bottomSheet = getLayoutInflater().inflate(R.layout.bottom_sheet_main, null);
+        orderFilterSpinner = bottomSheet.findViewById(R.id.spinner_order);
+        imageTypeFilterSpinner = bottomSheet.findViewById(R.id.spinner_image_type);
+        categoryFilterSpinner = bottomSheet.findViewById(R.id.spinner_image_category);
+    }
+
+    private void setupListeners() {
+        searchBarStartIcon.setOnClickListener(v -> clearSearchBarFocus());
 
         editSearchQuery.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) {
-                searchBarStartIcon.setImageResource(R.drawable.ic_arrow_back_black_24dp);
-            } else {
-                searchBarStartIcon.setImageResource(R.drawable.ic_search_black_24dp);
-            }
+            int rId = hasFocus ? R.drawable.ic_arrow_back_black_24dp : R.drawable.ic_search_black_24dp;
+            searchBarStartIcon.setImageResource(rId);
         });
 
         editSearchQuery.setOnKeyListener((v, keyCode, event) -> {
-            if (event.getAction() == KeyEvent.ACTION_DOWN &&
-                    (keyCode == KeyEvent.KEYCODE_ENTER)) {
-
-                editSearchQuery.clearFocus();
-                Helpers.hideKeyboard(MainActivity.this);
+            if (event.getAction() == KeyEvent.ACTION_DOWN && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                clearSearchBarFocus();
                 presenter.onSearch(editSearchQuery.getText().toString());
                 return true;
             }
             return false;
         });
 
-        searchBarFilterIcon.setOnClickListener(v -> {
-            View view = getLayoutInflater().inflate(R.layout.main_bottom_sheet, null);
-            bottomSpinnersInit(view);
-            presenter.onFiltersOpened();
+        searchBarFilterIcon.setOnClickListener(v -> presenter.onFilterIconClick());
 
-            BottomSheetDialog dialog = new BottomSheetDialog(MainActivity.this);
-            dialog.setContentView(view);
-            dialog.show();
-            dialog.setOnDismissListener(dialog1 -> presenter.onFiltersClosed(
-                    (int) orderFilterSpinner.getSelectedItemId(),
-                    (int) imageTypeFilterSpinner.getSelectedItemId(),
-                    (int) categoryFilterSpinner.getSelectedItemId()
-            ));
-        });
+        swipeRefreshLayout.setOnRefreshListener(this);
+
+        filterDialog.setOnDismissListener(dialog ->
+                presenter.onFiltersClosed(
+                        (int) orderFilterSpinner.getSelectedItemId(),
+                        (int) imageTypeFilterSpinner.getSelectedItemId(),
+                        (int) categoryFilterSpinner.getSelectedItemId()
+                )
+        );
+    }
+
+    private void clearSearchBarFocus() {
+        Helpers.hideKeyboard(MainActivity.this);
+        editSearchQuery.clearFocus();
     }
 
     private void toolbarInit() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
     }
 
-    private void swipeRefreshInit() {
-        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
-        swipeRefreshLayout.setOnRefreshListener(this);
+    private void initFilters() {
+        orderFilterAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item);
+        orderFilterSpinner.setAdapter(orderFilterAdapter);
+
+        imageTypeFilterAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item);
+        imageTypeFilterSpinner.setAdapter(imageTypeFilterAdapter);
+
+        categoryFilterAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item);
+        categoryFilterSpinner.setAdapter(categoryFilterAdapter);
+
+        filterDialog = new BottomSheetDialog(MainActivity.this);
+        filterDialog.setContentView(bottomSheet);
     }
-
-    private void bottomSpinnersInit(View v) {
-        orderFilterSpinner = v.findViewById(R.id.spinner_order);
-        imageTypeFilterSpinner = v.findViewById(R.id.spinner_image_type);
-        categoryFilterSpinner = v.findViewById(R.id.spinner_image_category);
-    }
-
-
-    @Override
-    public void fillFilterFields(PixabaySearchFilter filter) {
-        ArrayAdapter<String> adapter;
-        adapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_spinner_dropdown_item,
-                filter.getOrderTranslatedKeys().toArray(new String[0])
-        );
-        orderFilterSpinner.setAdapter(adapter);
-        orderFilterSpinner.setSelection(filter.getSelectedOrderId());
-
-        adapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_spinner_dropdown_item,
-                filter.getImageTypeTranslatedKeys().toArray(new String[0])
-        );
-        imageTypeFilterSpinner.setAdapter(adapter);
-        imageTypeFilterSpinner.setSelection(filter.getSelectedImageTypeId());
-
-        adapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_spinner_dropdown_item,
-                filter.getCategoryTranslatedKeys().toArray(new String[0])
-        );
-        categoryFilterSpinner.setAdapter(adapter);
-        categoryFilterSpinner.setSelection(filter.getSelectedCategoryId());
-    }
-
-    // TODO сделать в начале закрытие клавиатуры, а потом выход, если была активирована панель поиска
-    /*@Override
-    public void onBackPressed() {
-        super.onBackPressed();
-    }*/
 
     private void recyclerInit() {
-        RecyclerView recyclerView = findViewById(R.id.main_recycler);
         GridLayoutManager layoutManager = new GridLayoutManager(this, Constants.RECYCLER_COLUMNS);
         recyclerView.setLayoutManager(layoutManager);
         mainAdapter = new MainAdapter(this, presenter.getMainRecyclerPresenter());
         recyclerView.setAdapter(mainAdapter);
+    }
+
+    private void showToast(String text) {
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+    }
+
+    private String[] getFilterNamesFromRes(PixabaySearchFilter.FilterValue[] values) {
+        String[] names = new String[values.length];
+        for (int i = 0; i < values.length; i++) {
+            names[i] = getResources().getString(values[i].getValueNameResId());
+        }
+        return names;
+    }
+
+    @Override
+    public void showFilterDialog(PixabaySearchFilter filter) {
+        orderFilterAdapter.clear();
+        orderFilterAdapter.addAll(getFilterNamesFromRes(filter.getOrderValues()));
+        orderFilterSpinner.setSelection(filter.getSelectedOrderId());
+
+        imageTypeFilterAdapter.clear();
+        imageTypeFilterAdapter.addAll(getFilterNamesFromRes(filter.getImageTypeValues()));
+        imageTypeFilterSpinner.setSelection(filter.getSelectedImageTypeId());
+
+        categoryFilterAdapter.clear();
+        categoryFilterAdapter.addAll(getFilterNamesFromRes(filter.getCategoryValues()));
+        categoryFilterSpinner.setSelection(filter.getSelectedCategoryId());
+
+        filterDialog.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (editSearchQuery.isFocused()) {
+            clearSearchBarFocus();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -172,11 +203,6 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, Swip
     @Override
     public void showPhotosCount(int count) {
         showToast(getResources().getString(R.string.photos_count) + count);
-    }
-
-
-    private void showToast(String text) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
 
     @Override

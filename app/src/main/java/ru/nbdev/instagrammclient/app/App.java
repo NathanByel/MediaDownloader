@@ -21,12 +21,18 @@ public class App extends Application {
         }
         LeakCanary.install(this);
 
-        // TODO Разобраться почему не работает размещение ключа в crashlytics.properties
-        //crashlyticsInit();
+        //crashlyticsInitAlways();
+        crashlyticsInitNotForDebugBuild();
+
         appComponent = generateAppComponent();
     }
 
-    private void crashlyticsInit() {
+    private void crashlyticsInitAlways() {
+        // Set up Crashlytics always
+        Fabric.with(this, new Crashlytics());
+    }
+
+    private void crashlyticsInitNotForDebugBuild() {
         // Set up Crashlytics, disabled for debug builds
         Crashlytics crashlyticsKit = new Crashlytics.Builder()
                 .core(new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
@@ -34,9 +40,6 @@ public class App extends Application {
 
         // Initialize Fabric with the debug-disabled crashlytics.
         Fabric.with(this, crashlyticsKit);
-
-        // Set up Crashlytics always
-        // Fabric.with(this, new Crashlytics());
     }
 
     public static AppComponent getAppComponent() {

@@ -20,6 +20,7 @@ android {
             minifyEnabled true
             multiDexEnabled true
             shrinkResources true
+            ext.enableCrashlytics = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
 
@@ -27,6 +28,10 @@ android {
             ext.enableCrashlytics = false
         }
     }
+    buildTypes.each {
+        it.buildConfigField 'String', 'PIXABAY_API_KEY', PixabayApiKey
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8

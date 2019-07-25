@@ -16,9 +16,8 @@ import com.bumptech.glide.request.target.Target;
 import java.io.File;
 import java.io.IOException;
 
-import ru.nbdev.instagrammclient.Helpers;
-
 public class GlideLoader {
+
     private static final String TAG = "GlideLoader";
 
     private Context context;

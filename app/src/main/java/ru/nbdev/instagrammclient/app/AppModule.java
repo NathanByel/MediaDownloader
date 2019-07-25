@@ -13,6 +13,7 @@ import dagger.Provides;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import ru.nbdev.instagrammclient.model.Constants;
 import ru.nbdev.instagrammclient.model.retrofit.PixabayApiService;
 import ru.nbdev.instagrammclient.model.room.AppDatabase;
 
@@ -35,7 +36,7 @@ public class AppModule {
         GsonConverterFactory gsonConverterFactory = GsonConverterFactory.create(gson);
 
         return new Retrofit.Builder()
-                .baseUrl("https://pixabay.com")
+                .baseUrl(Constants.SERVER_BASE_URL)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(gsonConverterFactory)
                 .build()

@@ -13,9 +13,7 @@ import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import ru.nbdev.instagrammclient.PixabaySearchFilter;
 import ru.nbdev.instagrammclient.R;
-import ru.nbdev.instagrammclient.app.App;
 import ru.nbdev.instagrammclient.model.entity.Photo;
 import ru.nbdev.instagrammclient.model.retrofit.PixabayApiHelper;
 import ru.nbdev.instagrammclient.model.room.AppDatabase;
@@ -24,6 +22,7 @@ import ru.nbdev.instagrammclient.view.main.MainView;
 
 @InjectViewState
 public class MainPresenter extends MvpPresenter<MainView> {
+
     private static final String TAG = "MainPresenter";
 
     private MainRecyclerPresenter mainRecyclerPresenter;
@@ -35,7 +34,6 @@ public class MainPresenter extends MvpPresenter<MainView> {
     AppDatabase database;
 
     public MainPresenter() {
-        App.getAppComponent().inject(this);
         mainRecyclerPresenter = new MainRecyclerPresenter();
         pixabayApiHelper = new PixabayApiHelper();
         pixabaySearchFilter = new PixabaySearchFilter();
@@ -51,8 +49,8 @@ public class MainPresenter extends MvpPresenter<MainView> {
         searchPhotos(query, pixabaySearchFilter);
     }
 
-    public void onFiltersOpened() {
-        getViewState().fillFilterFields(pixabaySearchFilter);
+    public void onFilterIconClick() {
+        getViewState().showFilterDialog(pixabaySearchFilter);
     }
 
     public void onFiltersClosed(int orderId, int typeId, int categoryId) {
@@ -73,7 +71,7 @@ public class MainPresenter extends MvpPresenter<MainView> {
                 .subscribe(photos -> {
                     // TODO Надо придумать по каким правилам брать из базы или обновлять там данные, чтобы ссылки не протухали.
                     //if (photos.size() == 0) {
-                        loadPhotosListFromInternet();
+                    loadPhotosListFromInternet();
                     //} else {
                     //    photosList = photos;
                     //    updateRecycler();

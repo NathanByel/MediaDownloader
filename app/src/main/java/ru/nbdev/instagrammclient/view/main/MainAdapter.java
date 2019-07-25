@@ -17,6 +17,7 @@ import ru.nbdev.instagrammclient.model.entity.Photo;
 import ru.nbdev.instagrammclient.presenter.RecyclerPresenter;
 
 public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainRecyclerViewHolder> {
+
     private RecyclerPresenter recyclerPresenter;
     private GlideLoader glideLoader;
 
@@ -63,8 +64,8 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainRecyclerVi
         public void setPhotoData(Photo photo) {
             glideLoader.loadImage(photo.previewURL, imageView, null);
 
-            viewsTextView.setText( formatNumberToString(photo.views) );
-            likesTextView.setText( formatNumberToString(photo.likes) );
+            viewsTextView.setText(formatNumberToString(photo.views));
+            likesTextView.setText(formatNumberToString(photo.likes));
         }
 
         private String formatNumberToString(int number) {
