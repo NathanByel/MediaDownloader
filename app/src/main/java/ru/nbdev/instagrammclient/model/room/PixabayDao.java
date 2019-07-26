@@ -11,6 +11,7 @@ import java.util.List;
 
 import io.reactivex.Single;
 import ru.nbdev.instagrammclient.model.entity.Photo;
+import ru.nbdev.instagrammclient.model.entity.SearchRequest;
 
 @Dao
 public interface PixabayDao {
@@ -32,4 +33,15 @@ public interface PixabayDao {
 
     @Delete
     int delete(Photo photo);
+
+
+
+    @Query("SELECT * FROM table_photo_search_cache WHERE request = :request")
+    Single<SearchRequest> findSearchRequest(String request);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    long insert(SearchRequest searchRequest);
+
+    @Delete
+    int delete(SearchRequest searchRequest);
 }

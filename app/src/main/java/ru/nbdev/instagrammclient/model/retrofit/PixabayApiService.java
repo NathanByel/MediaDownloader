@@ -20,6 +20,7 @@ public interface PixabayApiService {
             @Query("image_type") String imageType,
             @Query("category") String category,
             @Query("order") String order,
+            @Query("page") int page,
             @Query("per_page") int perPage
     );
 

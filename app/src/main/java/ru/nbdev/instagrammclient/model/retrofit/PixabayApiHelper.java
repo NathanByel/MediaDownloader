@@ -22,13 +22,14 @@ public class PixabayApiHelper {
         return api.getPhotosList(BuildConfig.PIXABAY_API_KEY, 200).subscribeOn(Schedulers.io());
     }
 
-    public Observable<PhotosList> requestPhotosList(String query, PixabaySearchFilter filter) {
+    public Observable<PhotosList> requestPhotosList(String query, PixabaySearchFilter filter, int page) {
         return api.getPhotosList(
                 BuildConfig.PIXABAY_API_KEY,
                 query,
                 filter.getSelectedImageTypeKey(),
                 filter.getSelectedCategoryKey(),
                 filter.getSelectedOrderKey(),
+                page,
                 200
         ).subscribeOn(Schedulers.io());
     }
