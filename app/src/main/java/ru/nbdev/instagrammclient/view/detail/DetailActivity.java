@@ -199,7 +199,7 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
         showToast(getResources().getString(textId));
     }
 
-    public void showToast(String text) {
+    private void showToast(String text) {
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
 }

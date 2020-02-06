@@ -9,6 +9,10 @@
     <string name="storage_permission_needed">Нужны разрешения для сохранения файла</string>
     <string name="save_error">Ошибка сохранения</string>
     <string name="photos_count">Найдено:</string>
+    <string name="search_filter">Фильтр поиска</string>
+    <string name="sort">Сортировка</string>
+    <string name="type">Тип</string>
+    <string name="category">Категория</string>
     <string name="filter_all">Все</string>
     <string name="filter_animals">Животные</string>
     <string name="filter_backgrounds">Фон</string>

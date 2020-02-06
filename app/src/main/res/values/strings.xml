@@ -9,7 +9,10 @@
     <string name="storage_permission_needed">Storage permission is needed to save files</string>
     <string name="grant">GRANT</string>
     <string name="load_error">Load error!</string>
-
+    <string name="search_filter">Search filter</string>
+    <string name="sort">Sort</string>
+    <string name="type">Type</string>
+    <string name="category">Category</string>
     <string name="filter_popular">Popular</string>
     <string name="filter_latest">Latest</string>
     <string name="filter_all">All</string>

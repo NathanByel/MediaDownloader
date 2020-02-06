@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Фильтр поиска"
+        android:text="@string/search_filter"
         android:textStyle="bold" />
 
 
@@ -25,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1.5"
-            android:text="Сортировка" />
+            android:text="@string/sort" />
 
         <Spinner
             android:id="@+id/spinner_order"
@@ -47,7 +47,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1.5"
-            android:text="Тип" />
+            android:text="@string/type" />
 
         <Spinner
             android:id="@+id/spinner_image_type"
@@ -69,7 +69,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1.5"
-            android:text="Категория" />
+            android:text="@string/category" />
 
         <Spinner
             android:id="@+id/spinner_image_category"

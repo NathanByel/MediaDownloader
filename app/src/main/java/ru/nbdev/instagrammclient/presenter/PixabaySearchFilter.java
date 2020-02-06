@@ -5,15 +5,16 @@ import android.support.annotation.StringRes;
 import ru.nbdev.instagrammclient.R;
 
 /*
-    order	str	How the results should be ordered.
+    Pixabay api values:
+    order (string)      - How the results should be ordered.
     Accepted values: "popular", "latest"
     Default: "popular"
 
-    image_type	str	Filter results by image type.
+    image_type (string)	- Filter results by image type.
     Accepted values: "all", "photo", "illustration", "vector"
     Default: "all"
 
-    category	str	Filter results by category.
+    category (string)	- Filter results by category.
     Accepted values: fashion, nature, backgrounds, science, education, people, feelings, religion,
     health, places, animals, industry, food, computer, sports, transportation, travel, buildings, business, music
 */
