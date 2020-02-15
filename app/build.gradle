@@ -8,7 +8,7 @@ repositories {
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "ru.nbdev.instagrammclient"
+        applicationId "ru.nbdev.mediadownloader"
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
@@ -49,35 +49,51 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.android.support:recyclerview-v7:28.0.0'
 
+    // Moxy
     implementation 'com.arello-mobile:moxy:1.5.5'
     annotationProcessor 'com.arello-mobile:moxy-compiler:1.5.5'
     implementation 'com.arello-mobile:moxy-app-compat:1.5.5'
     implementation 'com.arello-mobile:moxy-android:1.5.5'
 
+    // Retrofit 2
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.squareup.retrofit2:converter-scalars:2.1.0'
 
+    // RxJava 2
     implementation 'io.reactivex.rxjava2:rxjava:2.1.14'
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
 
+    // Glide
     implementation 'com.github.bumptech.glide:glide:4.9.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
 
+    // Room
     implementation 'android.arch.persistence.room:runtime:1.1.1'
     annotationProcessor 'android.arch.persistence.room:compiler:1.1.1'
     implementation 'android.arch.persistence.room:rxjava2:1.1.1'
+    //def room_version = "2.2.3"
+    //implementation "androidx.room:room-runtime:$room_version"
+    //annotationProcessor "androidx.room:room-compiler:$room_version"
+    //implementation "androidx.room:room-rxjava2:$room_version"
 
+    // Dagger 2
     implementation 'com.google.dagger:dagger-android:2.20'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.20'
 
+    // Crashlytics
     implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
         transitive = true
     }
 
+    // LeakCanary
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.3'
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.6.3'
 
+    // PhotoView
     implementation 'com.github.chrisbanes:PhotoView:2.1.4'
+
+    // Timber logging
+    implementation 'com.jakewharton.timber:timber:4.7.0'
 }

@@ -8,5 +8,4 @@
     android:repeatCount="1"
     android:repeatMode="reverse"
     android:toXScale="1.2"
-    android:toYScale="1.2">
-</scale>
+    android:toYScale="1.2"></scale>

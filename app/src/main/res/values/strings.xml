@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">InstagrammClient</string>
+    <string name="app_name" translatable="false">MediaDownloader</string>
     <string name="photos_count">Found:</string>
     <string name="search">Search</string>
     <string name="mock_text">Text</string>
