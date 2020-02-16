@@ -3,8 +3,10 @@ package ru.nbdev.mediadownloader.view.detail;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.view.View;
@@ -21,9 +23,13 @@ import com.github.chrisbanes.photoview.PhotoView;
 
 import java.io.File;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import ru.nbdev.mediadownloader.R;
 import ru.nbdev.mediadownloader.app.App;
 import ru.nbdev.mediadownloader.common.Constants;
+import ru.nbdev.mediadownloader.common.FileDownloader;
 import ru.nbdev.mediadownloader.model.entity.Photo;
 import ru.nbdev.mediadownloader.presenter.DetailPresenter;
 import ru.nbdev.mediadownloader.view.GlideLoader;
@@ -121,7 +127,7 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
     @Override
     public void showPhoto(Photo photo) {
         setLoadMode();
-        glideLoader.loadImage(photo.fullSizeURL, photoView, new GlideLoader.OnImageLoadedListener() {
+        glideLoader.loadImage(photo.fullSizeURL, photoView, new GlideLoader.OnImageReadyListener() {
             @Override
             public void onError() {
                 setErrorMode(getResources().getString(R.string.load_error));
@@ -136,31 +142,20 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
 
     @Override
     public void savePhoto(Photo photo) {
-        String saveFileName = photo.id + "_L";
-        saveFileName += photo.fullSizeURL.substring(photo.fullSizeURL.lastIndexOf('.'));
+        String fileName = photo.id + "_L";
+        fileName += photo.fullSizeURL.substring(photo.fullSizeURL.lastIndexOf('.'));
 
-        glideLoader.saveImage(photo.fullSizeURL, saveFileName, new GlideLoader.OnImageSavedListener() {
-            @Override
-            public void onError() {
-                runOnUiThread(() -> showToast(getResources().getString(R.string.save_error)));
-            }
-
-            @Override
-            public void onSuccess(File file) {
-                runOnUiThread(() -> showToast(getResources().getString(R.string.saved_to) + " " + file.toString()));
-            }
-        });
-        /*FileDownloader downloader = new FileDownloader();
-        String fileName = "123.jpg";
+        FileDownloader downloader = new FileDownloader();
         File file = new File(Environment.getExternalStorageDirectory().toString() + File.separator + Environment.DIRECTORY_DOWNLOADS, fileName);
         Disposable disposable = downloader.download(photo.fullSizeURL, file)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> {
-                    showToast(getResources().getString(R.string.saved_to) + " ");
+                    updateAndroidGallery(file);
+                    showToast(getResources().getString(R.string.saved_to) + " " + file.toString());
                 }, throwable -> {
                     showToast(getResources().getString(R.string.save_error));
-                });*/
+                });
     }
 
     @Override
@@ -210,5 +205,11 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
 
     private void showToast(String text) {
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+    }
+
+    void updateAndroidGallery(File file) {
+        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        intent.setData(Uri.fromFile(file));
+        sendBroadcast(intent);
     }
 }

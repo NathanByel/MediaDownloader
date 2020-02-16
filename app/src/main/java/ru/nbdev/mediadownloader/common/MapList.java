@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MapList<K, V> {
-    private List<Item> list;
+    private final List<Item> list;
 
     public MapList() {
         list = new ArrayList<>();
@@ -59,12 +59,13 @@ public class MapList<K, V> {
         for (Item item : list) {
             vList.add(item.value);
         }
+
         return vList;
     }
 
     private class Item {
-        private K key;
-        private V value;
+        final K key;
+        final V value;
 
         Item(K key, V value) {
             this.key = key;

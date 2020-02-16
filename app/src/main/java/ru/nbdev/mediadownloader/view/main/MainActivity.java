@@ -29,7 +29,7 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, Swip
 
     private Toolbar toolbar;
     private RecyclerView recyclerView;
-    private MainAdapter mainAdapter;
+    private MainRecyclerAdapter mainRecyclerAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ProgressBar progressBar;
 
@@ -109,8 +109,8 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, Swip
     private void recyclerInit() {
         GridLayoutManager layoutManager = new GridLayoutManager(this, Constants.RECYCLER_COLUMNS);
         recyclerView.setLayoutManager(layoutManager);
-        mainAdapter = new MainAdapter(this, presenter.getMainRecyclerPresenter());
-        recyclerView.setAdapter(mainAdapter);
+        mainRecyclerAdapter = new MainRecyclerAdapter(this, presenter.getMainRecyclerPresenter());
+        recyclerView.setAdapter(mainRecyclerAdapter);
     }
 
     private void showToast(String text) {
@@ -150,7 +150,7 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, Swip
 
     @Override
     public void updateRecyclerView() {
-        mainAdapter.notifyDataSetChanged();
+        mainRecyclerAdapter.notifyDataSetChanged();
     }
 
     @Override

@@ -10,7 +10,8 @@ import java.lang.reflect.Type;
 public class ArrayTypeConverter {
     @TypeConverter
     public static int[] fromString(String value) {
-        Type type = new TypeToken<int[]>() {}.getType();
+        Type type = new TypeToken<int[]>() {
+        }.getType();
         return new Gson().fromJson(value, type);
     }
 

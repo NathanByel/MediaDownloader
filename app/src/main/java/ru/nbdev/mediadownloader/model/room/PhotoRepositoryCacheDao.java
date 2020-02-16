@@ -65,7 +65,7 @@ public abstract class PhotoRepositoryCacheDao {
     @Transaction
     public List<DbPhoto> getPhotosByRequest(DbSearchRequest request) {
         int[] photosId = getPhotosIdByRequest(request.request, request.getJsonExtraData());
-        if(photosId.length == 0) {
+        if (photosId.length == 0) {
             return null;
         }
         return getPhotosById(photosId);

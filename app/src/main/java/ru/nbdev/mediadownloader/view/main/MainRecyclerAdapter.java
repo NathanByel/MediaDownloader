@@ -17,12 +17,12 @@ import ru.nbdev.mediadownloader.model.entity.Photo;
 import ru.nbdev.mediadownloader.presenter.RecyclerPresenter;
 import ru.nbdev.mediadownloader.view.GlideLoader;
 
-public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainRecyclerViewHolder> {
+public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapter.MainRecyclerViewHolder> {
 
     private final RecyclerPresenter recyclerPresenter;
     private final GlideLoader glideLoader;
 
-    public MainAdapter(Context context, RecyclerPresenter recyclerPresenter) {
+    public MainRecyclerAdapter(Context context, RecyclerPresenter recyclerPresenter) {
         this.recyclerPresenter = recyclerPresenter;
         glideLoader = new GlideLoader(context);
     }
@@ -62,14 +62,14 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainRecyclerVi
             likesTextView = itemView.findViewById(R.id.text_view_likes);
         }
 
-        public void setOnClickListener(View.OnClickListener listener) {
+        public void setOnImageClickListener(View.OnClickListener listener) {
             imageView.setOnClickListener(listener);
         }
 
         @Override
         public void setPhotoData(Photo photo) {
             //viewLoad();
-            glideLoader.loadImage(photo.previewURL, imageView, new GlideLoader.OnImageLoadedListener() {
+            glideLoader.loadImage(photo.previewURL, imageView, new GlideLoader.OnImageReadyListener() {
                 @Override
                 public void onError() {
 

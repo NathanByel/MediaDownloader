@@ -11,8 +11,9 @@ import java.util.Map;
 public class MapTypeConverter {
 
     @TypeConverter
-    public static Map<String,Object> fromString(String value) {
-        Type type = new TypeToken<Map<String, Object>>(){}.getType();
+    public static Map<String, Object> fromString(String value) {
+        Type type = new TypeToken<Map<String, Object>>() {
+        }.getType();
         return new Gson().fromJson(value, type);
     }
 

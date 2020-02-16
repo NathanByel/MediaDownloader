@@ -42,7 +42,7 @@ public class DbSearchRequest {
 
     @Ignore
     public DbSearchRequest(@NonNull String request) {
-        this(request,null);
+        this(request, null);
     }
 
     @Ignore

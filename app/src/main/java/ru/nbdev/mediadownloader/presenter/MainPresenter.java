@@ -14,9 +14,9 @@ import ru.nbdev.mediadownloader.R;
 import ru.nbdev.mediadownloader.model.entity.Photo;
 import ru.nbdev.mediadownloader.model.entity.SearchRequest;
 import ru.nbdev.mediadownloader.model.entity.pixabay.PixabayFilter;
-import ru.nbdev.mediadownloader.model.repository.PhotoRepository;
 import ru.nbdev.mediadownloader.model.entity.pixabay.PixabaySearchRequest;
-import ru.nbdev.mediadownloader.view.main.MainAdapter;
+import ru.nbdev.mediadownloader.model.repository.PhotoRepository;
+import ru.nbdev.mediadownloader.view.main.MainRecyclerAdapter;
 import ru.nbdev.mediadownloader.view.main.MainView;
 import timber.log.Timber;
 
@@ -106,10 +106,10 @@ public class MainPresenter extends MvpPresenter<MainView> {
         }
 
         @Override
-        public void bindView(MainAdapter.MainRecyclerViewHolder mainRecyclerViewHolder) {
+        public void bindView(MainRecyclerAdapter.MainRecyclerViewHolder mainRecyclerViewHolder) {
             Photo photo = photosList.get(mainRecyclerViewHolder.getAdapterPosition());
             mainRecyclerViewHolder.setPhotoData(photo);
-            mainRecyclerViewHolder.setOnClickListener(v -> onItemClick((int)photo.id));
+            mainRecyclerViewHolder.setOnImageClickListener(v -> onItemClick((int) photo.id));
         }
 
         @Override

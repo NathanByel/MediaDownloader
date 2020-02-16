@@ -27,7 +27,7 @@ public class SearchRequest {
     }
 
     public void addExtraData(String key, Object value) {
-        if(extraData == null) {
+        if (extraData == null) {
             extraData = new HashMap<>();
         }
         extraData.put(key, value);
