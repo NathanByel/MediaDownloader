@@ -2,7 +2,6 @@ package ru.nbdev.mediadownloader.model.room.entity;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
@@ -37,15 +36,6 @@ public class DbSearchRequest {
     @ColumnInfo(name = "extra_data")
     public Map<String, Object> extraData;
 
-    public DbSearchRequest() {
-    }
-
-    @Ignore
-    public DbSearchRequest(@NonNull String request) {
-        this(request, null);
-    }
-
-    @Ignore
     public DbSearchRequest(@NonNull String request, Map<String, Object> extraData) {
         date = new Date();
         this.request = request;

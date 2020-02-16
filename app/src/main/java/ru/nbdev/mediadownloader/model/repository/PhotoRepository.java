@@ -7,6 +7,7 @@ import ru.nbdev.mediadownloader.model.entity.Photo;
 import ru.nbdev.mediadownloader.model.entity.SearchRequest;
 
 public interface PhotoRepository {
+
     String getServiceName();
 
     Single<List<Photo>> getRandomPhotos();

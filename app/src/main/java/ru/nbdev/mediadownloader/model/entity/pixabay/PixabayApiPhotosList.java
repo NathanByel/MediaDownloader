@@ -6,6 +6,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 public class PixabayApiPhotosList {
+
     @Expose
     @SerializedName("totalHits")
     public int totalHits;

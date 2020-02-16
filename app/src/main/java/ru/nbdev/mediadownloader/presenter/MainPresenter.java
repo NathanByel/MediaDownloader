@@ -8,6 +8,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import ru.nbdev.mediadownloader.R;
@@ -27,14 +28,27 @@ public class MainPresenter extends MvpPresenter<MainView> {
     private final MainRecyclerPresenter mainRecyclerPresenter;
     private PixabayFilter pixabayFilter;
     private String lastQuery;
+    private CompositeDisposable compositeDisposable;
 
     @Inject
     PhotoRepository photoRepository;
 
     public MainPresenter() {
         lastQuery = "";
+        compositeDisposable = new CompositeDisposable();
         mainRecyclerPresenter = new MainRecyclerPresenter();
         pixabayFilter = new PixabayFilter();
+    }
+
+    @Override
+    protected void onFirstViewAttach() {
+        searchPhotos("", pixabayFilter);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        compositeDisposable.clear();
     }
 
     public void onRefresh() {
@@ -56,11 +70,6 @@ public class MainPresenter extends MvpPresenter<MainView> {
         pixabayFilter = filter;
     }
 
-    @Override
-    protected void onFirstViewAttach() {
-        searchPhotos("", pixabayFilter);
-    }
-
     private void searchPhotos(String query, PixabayFilter filter) {
         getViewState().showProgress();
         SearchRequest request = new PixabaySearchRequest(query, filter);
@@ -76,6 +85,7 @@ public class MainPresenter extends MvpPresenter<MainView> {
                     Timber.e("searchPhotos() from repository error. %s", throwable.getMessage());
                     getViewState().showMessage(R.string.load_error);
                 });
+        compositeDisposable.add(disposable);
     }
 
     private void updateRecycler() {

@@ -2,22 +2,22 @@ package ru.nbdev.mediadownloader.app;
 
 import android.app.Application;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
-import ru.nbdev.mediadownloader.common.Constants;
+import ru.nbdev.mediadownloader.common.AndroidMediaManager;
+import ru.nbdev.mediadownloader.common.MediaManager;
+import ru.nbdev.mediadownloader.model.cache.PhotoCacheProvider;
+import ru.nbdev.mediadownloader.model.cache.RoomPhotoCacheProvider;
+import ru.nbdev.mediadownloader.model.network.ApiKeyProvider;
+import ru.nbdev.mediadownloader.model.network.HostProvider;
+import ru.nbdev.mediadownloader.model.network.pixabay.PixabayApi;
+import ru.nbdev.mediadownloader.model.network.pixabay.PixabayApiKeyProvider;
+import ru.nbdev.mediadownloader.model.network.pixabay.PixabayHostProvider;
 import ru.nbdev.mediadownloader.model.repository.CachedPhotoRepository;
 import ru.nbdev.mediadownloader.model.repository.PhotoRepository;
 import ru.nbdev.mediadownloader.model.repository.PixabayRepository;
-import ru.nbdev.mediadownloader.model.repository.RoomPhotoCacheRepository;
-import ru.nbdev.mediadownloader.model.retrofit.PixabayApiService;
 
 @Module
 public class AppModule {
@@ -30,28 +30,18 @@ public class AppModule {
 
     @Provides
     @Singleton
-    PixabayApiService providePixabayApi() {
-        Gson gson = new GsonBuilder()
-                .excludeFieldsWithoutExposeAnnotation()
-                .create();
-
-        GsonConverterFactory gsonConverterFactory = GsonConverterFactory.create(gson);
-
-        return new Retrofit.Builder()
-                .baseUrl(Constants.SERVER_BASE_URL)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(gsonConverterFactory)
-                .build()
-                .create(PixabayApiService.class);
+    PhotoRepository providePhotoRepository() {
+        HostProvider hostProvider = new PixabayHostProvider();
+        ApiKeyProvider apiKeyProvider = new PixabayApiKeyProvider();
+        PixabayApi pixabayApi = new PixabayApi(hostProvider);
+        PhotoRepository repository = new PixabayRepository(pixabayApi.getService(), apiKeyProvider);
+        PhotoCacheProvider photoCacheProvider = new RoomPhotoCacheProvider(application, repository.getServiceName());
+        return new CachedPhotoRepository(photoCacheProvider, repository);
     }
 
     @Provides
     @Singleton
-    PhotoRepository providePhotoRepository(PixabayApiService api) {
-        PhotoRepository repository = new PixabayRepository(api);
-        return new CachedPhotoRepository(
-                new RoomPhotoCacheRepository(application, repository.getServiceName()),
-                repository
-        );
+    MediaManager provideMediaManager() {
+        return new AndroidMediaManager(application);
     }
 }

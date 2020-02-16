@@ -15,6 +15,9 @@ import java.io.OutputStream;
 
 public class Helpers {
 
+    private Helpers() {
+    }
+
     public static void hideKeyboard(Activity activity) {
         if (activity != null) {
 
@@ -39,18 +42,6 @@ public class Helpers {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-            }
-        }
-    }
-
-    public static void copyFileUsingStream(File source, File dest) throws IOException {
-        try (InputStream is = new FileInputStream(source);
-             OutputStream os = new FileOutputStream(dest)) {
-
-            byte[] buffer = new byte[1024];
-            int length;
-            while ((length = is.read(buffer)) > 0) {
-                os.write(buffer, 0, length);
             }
         }
     }

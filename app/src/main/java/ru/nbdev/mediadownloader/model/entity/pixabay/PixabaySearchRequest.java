@@ -8,6 +8,7 @@ import java.util.Map;
 import ru.nbdev.mediadownloader.model.entity.SearchRequest;
 
 public class PixabaySearchRequest extends SearchRequest {
+
     private static final String SORT = "sort";
     private static final String TYPE = "type";
     private static final String CATEGORY = "category";

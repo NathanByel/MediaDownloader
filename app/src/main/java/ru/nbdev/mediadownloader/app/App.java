@@ -25,13 +25,17 @@ public class App extends Application {
         appComponentInit();
     }
 
+    public static AppComponent getAppComponent() {
+        return appComponent;
+    }
+
     private void loggingInit() {
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
+        } else {
+            Timber.plant(new CrashlyticsTree());
         }
-        Timber.plant(new CrashlyticsTree());
     }
-
 
     private void leakCanaryInit() {
         if (LeakCanary.isInAnalyzerProcess(this)) {
@@ -41,23 +45,6 @@ public class App extends Application {
     }
 
     private void crashlyticsInit() {
-        //crashlyticsInitAlways();
-        crashlyticsInitNotForDebugBuild();
-    }
-
-    private void appComponentInit() {
-        appComponent = DaggerAppComponent
-                .builder()
-                .appModule(new AppModule(this))
-                .build();
-    }
-
-    private void crashlyticsInitAlways() {
-        // Set up Crashlytics always
-        Fabric.with(this, new Crashlytics());
-    }
-
-    private void crashlyticsInitNotForDebugBuild() {
         // Set up Crashlytics, disabled for debug builds
         Crashlytics crashlyticsKit = new Crashlytics.Builder()
                 .core(new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
@@ -65,9 +52,14 @@ public class App extends Application {
 
         // Initialize Fabric with the debug-disabled crashlytics.
         Fabric.with(this, crashlyticsKit);
+        // Set up Crashlytics always
+        //Fabric.with(this, new Crashlytics());
     }
 
-    public static AppComponent getAppComponent() {
-        return appComponent;
+    private void appComponentInit() {
+        appComponent = DaggerAppComponent
+                .builder()
+                .appModule(new AppModule(this))
+                .build();
     }
 }

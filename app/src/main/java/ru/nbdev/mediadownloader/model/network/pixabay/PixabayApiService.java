@@ -1,6 +1,5 @@
-package ru.nbdev.mediadownloader.model.retrofit;
+package ru.nbdev.mediadownloader.model.network.pixabay;
 
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
@@ -26,7 +25,7 @@ public interface PixabayApiService {
     );
 
     @GET("api")
-    Observable<PixabayApiPhotosList> getById(
+    Single<PixabayApiPhotosList> getPhotoById(
             @Query("key") String key,
             @Query("id") int id
     );

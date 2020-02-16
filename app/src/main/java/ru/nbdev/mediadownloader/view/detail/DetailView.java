@@ -10,11 +10,9 @@ public interface DetailView extends MvpView {
 
     void showPhoto(Photo photo);
 
-    void savePhoto(Photo photo);
-
-    void sharePhoto(Photo photo);
-
     void checkWriteStoragePermissions();
 
     void showMessage(@StringRes int textId);
+
+    void showMessage(@StringRes int textId, String text);
 }

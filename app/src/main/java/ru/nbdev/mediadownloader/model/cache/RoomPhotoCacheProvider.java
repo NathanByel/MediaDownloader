@@ -1,4 +1,4 @@
-package ru.nbdev.mediadownloader.model.repository;
+package ru.nbdev.mediadownloader.model.cache;
 
 import android.arch.persistence.room.Room;
 import android.content.Context;
@@ -13,23 +13,29 @@ import ru.nbdev.mediadownloader.model.room.AppDatabase;
 import ru.nbdev.mediadownloader.model.room.entity.DbPhoto;
 import ru.nbdev.mediadownloader.model.room.entity.DbSearchRequest;
 
-public class RoomPhotoCacheRepository implements PhotoCacheRepository {
+public class RoomPhotoCacheProvider implements PhotoCacheProvider {
+
     private final AppDatabase database;
 
-    public RoomPhotoCacheRepository(Context context, String cacheName) {
+    public RoomPhotoCacheProvider(Context context, String cacheName) {
         database = Room.databaseBuilder(context, AppDatabase.class, "cache_" + cacheName).build();
     }
 
     @Override
+    public int deleteRequestAndPhotosOlderThan(Date date) {
+        return database.photoCacheDao().deleteRequestAndPhotosOlderThan(date);
+    }
+
+    @Override
     public Date getRequestDate(SearchRequest searchRequest) {
-        return database.photoRepositoryCacheDao().getRequestDate(
+        return database.photoCacheDao().getRequestDate(
                 mapSearchRequestToDbSearchRequest(searchRequest)
         );
     }
 
     @Override
     public void insertRequestAndPhotos(SearchRequest searchRequest, List<Photo> photos) {
-        database.photoRepositoryCacheDao().insertRequestAndPhotos(
+        database.photoCacheDao().insertRequestAndPhotos(
                 mapSearchRequestToDbSearchRequest(searchRequest),
                 mapPhotosToDbPhotos(photos)
         );
@@ -38,7 +44,7 @@ public class RoomPhotoCacheRepository implements PhotoCacheRepository {
     @Override
     public List<Photo> getPhotosByRequest(SearchRequest searchRequest) {
         return mapDbPhotosToPhotos(
-                database.photoRepositoryCacheDao().getPhotosByRequest(
+                database.photoCacheDao().getPhotosByRequest(
                         mapSearchRequestToDbSearchRequest(searchRequest)
                 )
         );
@@ -47,7 +53,7 @@ public class RoomPhotoCacheRepository implements PhotoCacheRepository {
     @Override
     public Photo getPhoto(long id) {
         return mapDbPhotoToPhoto(
-                database.photoRepositoryCacheDao().getPhotoById(id)
+                database.photoCacheDao().getPhotoById(id)
         );
     }
 

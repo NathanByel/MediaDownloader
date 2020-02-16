@@ -5,6 +5,7 @@ import android.arch.persistence.room.TypeConverter;
 import java.util.Date;
 
 public class DateTypeConverter {
+
     @TypeConverter
     public static Date fromLong(long date) {
         return new Date(date);

@@ -14,7 +14,8 @@ import com.bumptech.glide.request.target.Target;
 import ru.nbdev.mediadownloader.R;
 
 public class GlideLoader {
-    private Context context;
+
+    private final Context context;
 
     public GlideLoader(Context context) {
         this.context = context;
@@ -29,7 +30,7 @@ public class GlideLoader {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                         if (listener != null) {
-                            listener.onError();
+                            listener.onError(e);
                         }
                         return false;
                     }
@@ -46,7 +47,7 @@ public class GlideLoader {
     }
 
     public interface OnImageReadyListener {
-        void onError();
+        void onError(GlideException e);
 
         void onSuccess();
     }

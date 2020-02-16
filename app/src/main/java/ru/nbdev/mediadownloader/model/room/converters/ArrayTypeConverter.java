@@ -8,6 +8,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 
 public class ArrayTypeConverter {
+
     @TypeConverter
     public static int[] fromString(String value) {
         Type type = new TypeToken<int[]>() {

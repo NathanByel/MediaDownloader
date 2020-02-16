@@ -55,11 +55,31 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, Swip
         setContentView(R.layout.activity_main);
 
         pixabayFilterSheet = new PixabayFilterSheet(this);
-
         findViews();
         toolbarInit();
         recyclerInit();
         setupListeners();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.onDestroy();
+    }
+
+    @Override
+    public void onRefresh() {
+        swipeRefreshLayout.setRefreshing(false);
+        presenter.onRefresh();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (editSearchQuery.isFocused()) {
+            clearSearchBarFocus();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     private void findViews() {
@@ -133,15 +153,6 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, Swip
     }
 
     @Override
-    public void onBackPressed() {
-        if (editSearchQuery.isFocused()) {
-            clearSearchBarFocus();
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
     public void runDetailActivity(int photoId) {
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra(Constants.EXTRA_PHOTO_ID_INT, photoId);
@@ -161,11 +172,5 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, Swip
     @Override
     public void showPhotosCount(int count) {
         showToast(getResources().getString(R.string.photos_count) + count);
-    }
-
-    @Override
-    public void onRefresh() {
-        swipeRefreshLayout.setRefreshing(false);
-        presenter.onRefresh();
     }
 }

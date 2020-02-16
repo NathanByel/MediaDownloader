@@ -7,12 +7,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 
-import io.reactivex.Completable;
+import io.reactivex.Single;
 
 public class FileDownloader {
 
-    public Completable download(String fileUrl, File saveTo) {
-        return Completable.create(emitter -> {
+    public Single<File> download(String fileUrl, File saveTo) {
+        return Single.create(emitter -> {
             try (BufferedInputStream inputStream = new BufferedInputStream(new URL(fileUrl).openStream());
                  BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(saveTo))) {
 
@@ -20,7 +20,7 @@ public class FileDownloader {
                 while ((data = inputStream.read()) != -1) {
                     outputStream.write(data);
                 }
-                emitter.onComplete();
+                emitter.onSuccess(saveTo);
             } catch (IOException e) {
                 emitter.onError(e);
             }

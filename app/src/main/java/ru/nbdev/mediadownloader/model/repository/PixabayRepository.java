@@ -5,21 +5,23 @@ import java.util.List;
 
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
-import ru.nbdev.mediadownloader.BuildConfig;
 import ru.nbdev.mediadownloader.model.entity.Photo;
 import ru.nbdev.mediadownloader.model.entity.SearchRequest;
 import ru.nbdev.mediadownloader.model.entity.pixabay.PixabayApiPhoto;
 import ru.nbdev.mediadownloader.model.entity.pixabay.PixabaySearchRequest;
-import ru.nbdev.mediadownloader.model.retrofit.PixabayApiService;
+import ru.nbdev.mediadownloader.model.network.ApiKeyProvider;
+import ru.nbdev.mediadownloader.model.network.pixabay.PixabayApiService;
 
 public class PixabayRepository implements PhotoRepository {
 
     private static final String serviceName = "pixabay.com";
 
-    private PixabayApiService api;
+    private final PixabayApiService api;
+    private final ApiKeyProvider apiKeyProvider;
 
-    public PixabayRepository(PixabayApiService api) {
+    public PixabayRepository(PixabayApiService api, ApiKeyProvider apiKeyProvider) {
         this.api = api;
+        this.apiKeyProvider = apiKeyProvider;
     }
 
     @Override
@@ -29,19 +31,23 @@ public class PixabayRepository implements PhotoRepository {
 
     @Override
     public Single<Photo> getPhotoById(int id) {
-        return Single.fromObservable(
-                api.getById(BuildConfig.PIXABAY_API_KEY, id)
-                        .subscribeOn(Schedulers.io())
-                        .map(pixabayApiPhotosList -> {
-                            //FIXME
-                            return mapApiPhotoToPhoto(pixabayApiPhotosList.hits.get(0));
-                        })
-        );
+        return api.getPhotoById(
+                apiKeyProvider.getApiKey(),
+                id
+        )
+                .subscribeOn(Schedulers.io())
+                .map(pixabayApiPhotosList -> {
+                    //FIXME need check hits to null
+                    return mapApiPhotoToPhoto(pixabayApiPhotosList.hits.get(0));
+                });
     }
 
     @Override
     public Single<List<Photo>> getRandomPhotos() {
-        return api.getPhotosList(BuildConfig.PIXABAY_API_KEY, 200)
+        return api.getPhotosList(
+                apiKeyProvider.getApiKey(),
+                200
+        )
                 .subscribeOn(Schedulers.io())
                 .map(pixabayApiPhotosList -> mapApiPhotosToPhotos(pixabayApiPhotosList.hits));
     }
@@ -51,7 +57,7 @@ public class PixabayRepository implements PhotoRepository {
         if (request instanceof PixabaySearchRequest) {
             PixabaySearchRequest pixabayRequest = (PixabaySearchRequest) request;
             return api.getPhotosList(
-                    BuildConfig.PIXABAY_API_KEY,
+                    apiKeyProvider.getApiKey(),
                     pixabayRequest.getRequest(),
                     pixabayRequest.typeKey(),
                     pixabayRequest.categoryKey(),
@@ -63,7 +69,7 @@ public class PixabayRepository implements PhotoRepository {
                     .map(pixabayApiPhotosList -> mapApiPhotosToPhotos(pixabayApiPhotosList.hits));
         } else {
             return api.getPhotosList(
-                    BuildConfig.PIXABAY_API_KEY,
+                    apiKeyProvider.getApiKey(),
                     200
             ).subscribeOn(Schedulers.io())
                     .map(pixabayApiPhotosList -> mapApiPhotosToPhotos(pixabayApiPhotosList.hits));

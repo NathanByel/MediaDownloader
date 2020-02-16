@@ -10,6 +10,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.engine.GlideException;
+
 import java.util.Locale;
 
 import ru.nbdev.mediadownloader.R;
@@ -71,7 +73,7 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
             //viewLoad();
             glideLoader.loadImage(photo.previewURL, imageView, new GlideLoader.OnImageReadyListener() {
                 @Override
-                public void onError() {
+                public void onError(GlideException e) {
 
                 }
 

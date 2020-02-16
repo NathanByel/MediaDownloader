@@ -16,7 +16,7 @@ import ru.nbdev.mediadownloader.model.room.entity.DbPhoto;
 import ru.nbdev.mediadownloader.model.room.entity.DbSearchRequest;
 
 @Dao
-public abstract class PhotoRepositoryCacheDao {
+public abstract class PhotoCacheDao {
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     public abstract long insertRequest(DbSearchRequest dbSearchRequest);
@@ -25,7 +25,23 @@ public abstract class PhotoRepositoryCacheDao {
     public abstract long[] insertPhotos(List<DbPhoto> photos);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
+    public abstract long insertPhoto(DbPhoto photo);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract void insertJoinRequestAndPhotos(DbJoinRequestAndPhotos[] joinPhotos);
+
+    @Transaction
+    @Query("DELETE FROM photos_table " +
+            "WHERE _id IN( " +
+            "SELECT photos_tbl._id " +
+            "FROM photos_table AS photos_tbl " +
+            "LEFT JOIN join_request_and_photos_table AS join_tbl ON photos_tbl._id = join_tbl.photo_id " +
+            "WHERE join_tbl.photo_id is NULL);")
+    public abstract int deleteUnusedPhotos();
+
+    @Query("DELETE FROM search_requests_table " +
+            "WHERE date < :utcTime;")
+    public abstract int deleteRequestOlderThan(long utcTime);
 
     @Query("SELECT request_tbl.date " +
             "FROM search_requests_table AS request_tbl " +
@@ -33,8 +49,7 @@ public abstract class PhotoRepositoryCacheDao {
     @TypeConverters({DateTypeConverter.class})
     public abstract Date getRequestDate(String request, String extraData);
 
-    @Query("SELECT " +
-            "join_tbl.photo_id AS photo_id " +
+    @Query("SELECT join_tbl.photo_id AS photo_id " +
             "FROM search_requests_table AS request_tbl " +
             "JOIN join_request_and_photos_table AS join_tbl ON request_tbl._id = join_tbl.search_id " +
             "WHERE request == :request AND extra_data == :extraData")
@@ -63,6 +78,13 @@ public abstract class PhotoRepositoryCacheDao {
     }
 
     @Transaction
+    public int deleteRequestAndPhotosOlderThan(Date date) {
+        int deleted = deleteRequestOlderThan(date.getTime());
+        deleteUnusedPhotos();
+        return deleted;
+    }
+
+    @Transaction
     public List<DbPhoto> getPhotosByRequest(DbSearchRequest request) {
         int[] photosId = getPhotosIdByRequest(request.request, request.getJsonExtraData());
         if (photosId.length == 0) {
@@ -74,17 +96,4 @@ public abstract class PhotoRepositoryCacheDao {
     public Date getRequestDate(DbSearchRequest request) {
         return getRequestDate(request.request, request.getJsonExtraData());
     }
-
-    //    /*
-//    delete photo without search id
-//    SELECT
-//        *
-//    FROM
-//        table_photos_list AS photos_tbl
-//    LEFT JOIN
-//        table_request_photos_list AS index_tbl ON photos_tbl.id = index_tbl.photo_id
-//    WHERE
-//        index_tbl.photo_id is NULL
-//    ;
-//    */
 }

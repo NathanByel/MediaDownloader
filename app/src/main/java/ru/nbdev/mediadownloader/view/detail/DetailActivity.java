@@ -1,12 +1,9 @@
 package ru.nbdev.mediadownloader.view.detail;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.view.View;
@@ -19,20 +16,16 @@ import android.widget.Toast;
 import com.arellomobile.mvp.MvpAppCompatActivity;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
+import com.bumptech.glide.load.engine.GlideException;
 import com.github.chrisbanes.photoview.PhotoView;
 
-import java.io.File;
-
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 import ru.nbdev.mediadownloader.R;
 import ru.nbdev.mediadownloader.app.App;
 import ru.nbdev.mediadownloader.common.Constants;
-import ru.nbdev.mediadownloader.common.FileDownloader;
 import ru.nbdev.mediadownloader.model.entity.Photo;
 import ru.nbdev.mediadownloader.presenter.DetailPresenter;
 import ru.nbdev.mediadownloader.view.GlideLoader;
+import timber.log.Timber;
 
 public class DetailActivity extends MvpAppCompatActivity implements DetailView {
 
@@ -70,6 +63,12 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
         setLoadMode();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.onDestroy();
+    }
+
     private void setupListeners() {
         iconDownload.setOnClickListener(v -> {
             iconDownload.startAnimation(animationZoomInOut);
@@ -98,12 +97,6 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
         layoutTopPanel.setVisibility(visibility ? View.VISIBLE : View.INVISIBLE);
     }
 
-    private void requestWriteStoragePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_EXTERNAL_STORAGE);
-        }
-    }
-
     private void setLoadMode() {
         setTopPanelVisibility(false);
         photoView.setVisibility(View.VISIBLE);
@@ -129,7 +122,8 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
         setLoadMode();
         glideLoader.loadImage(photo.fullSizeURL, photoView, new GlideLoader.OnImageReadyListener() {
             @Override
-            public void onError() {
+            public void onError(GlideException e) {
+                Timber.e("glideLoader.loadImage(), %s", e.toString());
                 setErrorMode(getResources().getString(R.string.load_error));
             }
 
@@ -140,29 +134,17 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
         });
     }
 
-    @Override
-    public void savePhoto(Photo photo) {
-        String fileName = photo.id + "_L";
-        fileName += photo.fullSizeURL.substring(photo.fullSizeURL.lastIndexOf('.'));
-
-        FileDownloader downloader = new FileDownloader();
-        File file = new File(Environment.getExternalStorageDirectory().toString() + File.separator + Environment.DIRECTORY_DOWNLOADS, fileName);
-        Disposable disposable = downloader.download(photo.fullSizeURL, file)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> {
-                    updateAndroidGallery(file);
-                    showToast(getResources().getString(R.string.saved_to) + " " + file.toString());
-                }, throwable -> {
-                    showToast(getResources().getString(R.string.save_error));
-                });
+    private void requestWriteStoragePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_EXTERNAL_STORAGE);
+        }
     }
 
     @Override
     public void checkWriteStoragePermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                presenter.onWriteStoragePermissionGranted();
+                presenter.onWriteStoragePermissionReady(true);
             } else {
                 if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                     final String message = getResources().getString(R.string.storage_permission_needed);
@@ -179,23 +161,10 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == Constants.REQUEST_WRITE_EXTERNAL_STORAGE && grantResults.length == 1) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                presenter.onWriteStoragePermissionGranted();
-            } else {
-                showToast(getResources().getString(R.string.storage_permission_needed));
-            }
+            presenter.onWriteStoragePermissionReady(grantResults[0] == PackageManager.PERMISSION_GRANTED);
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
-    }
-
-    @Override
-    public void sharePhoto(Photo photo) {
-        Intent share = new Intent(android.content.Intent.ACTION_SEND);
-        share.setType("text/plain");
-        share.putExtra(Intent.EXTRA_TEXT, photo.fullSizeURL);
-
-        startActivity(Intent.createChooser(share, getResources().getString(R.string.send_url)));
     }
 
     @Override
@@ -203,13 +172,12 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
         showToast(getResources().getString(textId));
     }
 
-    private void showToast(String text) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+    @Override
+    public void showMessage(int textId, String text) {
+        showToast(getResources().getString(textId) + text);
     }
 
-    void updateAndroidGallery(File file) {
-        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        intent.setData(Uri.fromFile(file));
-        sendBroadcast(intent);
+    private void showToast(String text) {
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
 }

@@ -10,7 +10,5 @@ import ru.nbdev.mediadownloader.model.room.entity.DbSearchRequest;
 @Database(entities = {DbPhoto.class, DbSearchRequest.class, DbJoinRequestAndPhotos.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
-    public abstract PhotosDao photosDao();
-
-    public abstract PhotoRepositoryCacheDao photoRepositoryCacheDao();
+    public abstract PhotoCacheDao photoCacheDao();
 }

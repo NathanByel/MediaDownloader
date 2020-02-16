@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SearchRequest {
+
     private String request;
     protected Map<String, Object> extraData;
 
@@ -24,12 +25,5 @@ public class SearchRequest {
 
     public Map<String, Object> getExtraData() {
         return extraData;
-    }
-
-    public void addExtraData(String key, Object value) {
-        if (extraData == null) {
-            extraData = new HashMap<>();
-        }
-        extraData.put(key, value);
     }
 }

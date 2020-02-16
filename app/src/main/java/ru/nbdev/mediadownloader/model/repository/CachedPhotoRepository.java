@@ -1,23 +1,37 @@
 package ru.nbdev.mediadownloader.model.repository;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Maybe;
+import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import ru.nbdev.mediadownloader.model.cache.PhotoCacheProvider;
 import ru.nbdev.mediadownloader.model.entity.Photo;
 import ru.nbdev.mediadownloader.model.entity.SearchRequest;
 import timber.log.Timber;
 
 public class CachedPhotoRepository implements PhotoRepository {
 
-    private PhotoCacheRepository cache;
-    private PhotoRepository photoRepository;
+    private final PhotoCacheProvider cache;
+    private final PhotoRepository photoRepository;
 
-    public CachedPhotoRepository(PhotoCacheRepository cache, PhotoRepository photoRepository) {
+    public CachedPhotoRepository(PhotoCacheProvider cache, PhotoRepository photoRepository) {
         this.cache = cache;
         this.photoRepository = photoRepository;
+        Disposable disposable = Observable.interval(10, TimeUnit.SECONDS, Schedulers.io())
+                .subscribe(aLong -> {
+                    Calendar calendar = GregorianCalendar.getInstance();
+                    calendar.roll(Calendar.MINUTE, -1);
+                    int deleted = cache.deleteRequestAndPhotosOlderThan(calendar.getTime());
+                    Timber.d("Drop cache %s. Deleted records %d", photoRepository.getServiceName(), deleted);
+                });
     }
 
     @Override

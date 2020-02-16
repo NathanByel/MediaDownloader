@@ -8,12 +8,13 @@ import com.crashlytics.android.Crashlytics;
 import timber.log.Timber;
 
 public class CrashlyticsTree extends Timber.Tree {
+
     private static final String CRASHLYTICS_KEY_PRIORITY = "priority";
     private static final String CRASHLYTICS_KEY_TAG = "tag";
     private static final String CRASHLYTICS_KEY_MESSAGE = "message";
 
     @Override
-    protected void log(int priority, @Nullable String tag, @Nullable String message, @Nullable Throwable t) {
+    protected void log(int priority, @Nullable String tag, @Nullable String message, @Nullable Throwable throwable) {
         if (priority == Log.VERBOSE || priority == Log.DEBUG || priority == Log.INFO) {
             return;
         }
@@ -22,10 +23,10 @@ public class CrashlyticsTree extends Timber.Tree {
         Crashlytics.setString(CRASHLYTICS_KEY_TAG, tag);
         Crashlytics.setString(CRASHLYTICS_KEY_MESSAGE, message);
 
-        if (t == null) {
+        if (throwable == null) {
             Crashlytics.logException(new Exception(message));
         } else {
-            Crashlytics.logException(t);
+            Crashlytics.logException(throwable);
         }
     }
 }
