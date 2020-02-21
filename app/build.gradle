@@ -1,9 +1,5 @@
 apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
-
-repositories {
-    maven { url 'https://maven.fabric.io/public' }
-}
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 28
@@ -21,11 +17,25 @@ android {
             multiDexEnabled true
             shrinkResources true
             ext.enableCrashlytics = true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
+                    'proguard-rules.pro',
+                    'retrofit2.pro',
+                    'gson.pro',
+                    'firebase.pro'
         }
 
         debug {
-            ext.enableCrashlytics = false
+            //ext.enableCrashlytics = false
+
+            minifyEnabled true
+            multiDexEnabled true
+            shrinkResources true
+            ext.enableCrashlytics = true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
+                    'proguard-rules.pro',
+                    'retrofit2.pro',
+                    'gson.pro',
+                    'firebase.pro'
         }
     }
     buildTypes.each {
@@ -62,7 +72,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-scalars:2.1.0'
 
     // RxJava 2
-    implementation 'io.reactivex.rxjava2:rxjava:2.1.14'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.9'
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
 
     // Glide
@@ -73,19 +83,13 @@ dependencies {
     implementation 'android.arch.persistence.room:runtime:1.1.1'
     annotationProcessor 'android.arch.persistence.room:compiler:1.1.1'
     implementation 'android.arch.persistence.room:rxjava2:1.1.1'
-    //def room_version = "2.2.3"
-    //implementation "androidx.room:room-runtime:$room_version"
-    //annotationProcessor "androidx.room:room-compiler:$room_version"
-    //implementation "androidx.room:room-rxjava2:$room_version"
 
     // Dagger 2
     implementation 'com.google.dagger:dagger-android:2.20'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.20'
 
-    // Crashlytics
-    implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
-        transitive = true
-    }
+    // Add the Firebase SDK for Google Analytics
+    implementation 'com.google.firebase:firebase-analytics:17.2.2'
 
     // LeakCanary
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.3'

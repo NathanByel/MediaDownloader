@@ -37,28 +37,32 @@ public abstract class PhotoCacheDao {
             "FROM photos_table AS photos_tbl " +
             "LEFT JOIN join_request_and_photos_table AS join_tbl ON photos_tbl._id = join_tbl.photo_id " +
             "WHERE join_tbl.photo_id is NULL);")
-    public abstract int deleteUnusedPhotos();
+    public abstract void deleteUnusedPhotos();
 
     @Query("DELETE FROM search_requests_table " +
             "WHERE date < :utcTime;")
-    public abstract int deleteRequestOlderThan(long utcTime);
+    public abstract int deleteRequestsOlderThan(long utcTime);
+
+    @Query("DELETE FROM search_requests_table " +
+            "WHERE request == :request AND extra_data == :extraDataJSON")
+    public abstract int deleteRequest(String request, String extraDataJSON);
 
     @Query("SELECT request_tbl.date " +
             "FROM search_requests_table AS request_tbl " +
-            "WHERE request == :request AND extra_data == :extraData")
+            "WHERE request == :request AND extra_data == :extraDataJSON")
     @TypeConverters({DateTypeConverter.class})
-    public abstract Date getRequestDate(String request, String extraData);
+    public abstract Date getRequestDate(String request, String extraDataJSON);
 
     @Query("SELECT join_tbl.photo_id AS photo_id " +
             "FROM search_requests_table AS request_tbl " +
             "JOIN join_request_and_photos_table AS join_tbl ON request_tbl._id = join_tbl.search_id " +
-            "WHERE request == :request AND extra_data == :extraData")
-    public abstract int[] getPhotosIdByRequest(String request, String extraData);
+            "WHERE request == :request AND extra_data == :extraDataJSON")
+    public abstract int[] getPhotosIds(String request, String extraDataJSON);
 
     @Query("SELECT * " +
             "FROM photos_table " +
             "WHERE _id IN (:photosId)")
-    public abstract List<DbPhoto> getPhotosById(int[] photosId);
+    public abstract List<DbPhoto> getPhotosByIds(int[] photosId);
 
     @Query("SELECT * " +
             "FROM photos_table " +
@@ -79,21 +83,17 @@ public abstract class PhotoCacheDao {
 
     @Transaction
     public int deleteRequestAndPhotosOlderThan(Date date) {
-        int deleted = deleteRequestOlderThan(date.getTime());
+        int deleted = deleteRequestsOlderThan(date.getTime());
         deleteUnusedPhotos();
         return deleted;
     }
 
     @Transaction
-    public List<DbPhoto> getPhotosByRequest(DbSearchRequest request) {
-        int[] photosId = getPhotosIdByRequest(request.request, request.getJsonExtraData());
+    public List<DbPhoto> getPhotosByRequest(String request, String extraDataJSON) {
+        int[] photosId = getPhotosIds(request, extraDataJSON);
         if (photosId.length == 0) {
             return null;
         }
-        return getPhotosById(photosId);
-    }
-
-    public Date getRequestDate(DbSearchRequest request) {
-        return getRequestDate(request.request, request.getJsonExtraData());
+        return getPhotosByIds(photosId);
     }
 }

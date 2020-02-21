@@ -2,7 +2,6 @@ package ru.nbdev.mediadownloader.model.entity;
 
 import android.support.annotation.NonNull;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class SearchRequest {

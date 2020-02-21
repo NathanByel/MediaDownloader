@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginEnd="16dp"
     android:background="@drawable/background_main_search_bar"
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true"
@@ -10,14 +10,15 @@
     android:padding="2dp">
 
     <ImageView
-        android:id="@+id/icon_search_bar_start"
+        android:id="@+id/imageview_search_bar_start"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:src="@drawable/ic_search_black_24dp" />
+        android:src="@drawable/ic_search_black_24dp"
+        tools:ignore="ContentDescription" />
 
     <EditText
-        android:id="@+id/edit_search_bar_query"
+        android:id="@+id/edittext_search_bar_query"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0.2"
@@ -27,9 +28,10 @@
         android:singleLine="true" />
 
     <ImageView
-        android:id="@+id/icon_search_bar_filter"
+        android:id="@+id/imageview_search_bar_filter"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:src="@drawable/ic_tune_black_24dp" />
+        android:src="@drawable/ic_tune_black_24dp"
+        tools:ignore="ContentDescription" />
 </LinearLayout>

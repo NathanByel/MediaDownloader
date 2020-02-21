@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Single;
-import io.reactivex.schedulers.Schedulers;
 import ru.nbdev.mediadownloader.model.entity.Photo;
 import ru.nbdev.mediadownloader.model.entity.SearchRequest;
 import ru.nbdev.mediadownloader.model.entity.pixabay.PixabayApiPhoto;
@@ -35,20 +34,15 @@ public class PixabayRepository implements PhotoRepository {
                 apiKeyProvider.getApiKey(),
                 id
         )
-                .subscribeOn(Schedulers.io())
-                .map(pixabayApiPhotosList -> {
-                    //FIXME need check hits to null
-                    return mapApiPhotoToPhoto(pixabayApiPhotosList.hits.get(0));
-                });
+                .map(pixabayApiPhotosList -> mapApiPhotoToPhoto(pixabayApiPhotosList.hits.get(0)));
     }
 
     @Override
     public Single<List<Photo>> getRandomPhotos() {
-        return api.getPhotosList(
+        return api.getRandomPhotosList(
                 apiKeyProvider.getApiKey(),
                 200
         )
-                .subscribeOn(Schedulers.io())
                 .map(pixabayApiPhotosList -> mapApiPhotosToPhotos(pixabayApiPhotosList.hits));
     }
 
@@ -65,14 +59,9 @@ public class PixabayRepository implements PhotoRepository {
                     1,
                     200
             )
-                    .subscribeOn(Schedulers.io())
                     .map(pixabayApiPhotosList -> mapApiPhotosToPhotos(pixabayApiPhotosList.hits));
         } else {
-            return api.getPhotosList(
-                    apiKeyProvider.getApiKey(),
-                    200
-            ).subscribeOn(Schedulers.io())
-                    .map(pixabayApiPhotosList -> mapApiPhotosToPhotos(pixabayApiPhotosList.hits));
+            return getRandomPhotos();
         }
     }
 

@@ -8,13 +8,15 @@ import ru.nbdev.mediadownloader.model.entity.SearchRequest;
 
 public interface PhotoCacheProvider {
 
-    int deleteRequestAndPhotosOlderThan(Date date);
+    int deleteRecordsOlderThan(Date date);
 
-    Date getRequestDate(SearchRequest searchRequest);
+    Date getRecordDate(SearchRequest request);
 
-    void insertRequestAndPhotos(SearchRequest searchRequest, List<Photo> photos);
+    void insertRecord(CacheRecord record);
+
+    void deleteRecord(SearchRequest request);
 
     List<Photo> getPhotosByRequest(SearchRequest request);
 
-    Photo getPhoto(long id);
+    Photo getPhotoById(long id);
 }

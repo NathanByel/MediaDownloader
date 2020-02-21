@@ -6,7 +6,5 @@ public interface RecyclerPresenter {
 
     int getItemCount();
 
-    void bindView(MainRecyclerAdapter.MainRecyclerViewHolder mainRecyclerViewHolder);
-
-    void onItemClick(int photoId);
+    void bindView(MainRecyclerAdapter.MainRecyclerViewHolderImpl mainRecyclerViewHolder);
 }

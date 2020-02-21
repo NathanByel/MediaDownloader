@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center_horizontal|center_vertical"
     tools:context=".view.detail.DetailActivity">
 
     <LinearLayout
@@ -13,21 +13,23 @@
         android:layout_gravity="top"
         android:background="@drawable/gradient_detail_top"
         android:elevation="2dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp">
 
         <ImageView
-            android:id="@+id/icon_detail_download"
+            android:id="@+id/imageview_detail_download"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:src="@drawable/ic_download_24dp"
             tools:ignore="ContentDescription" />
 
         <ImageView
-            android:id="@+id/icon_detail_share"
+            android:id="@+id/imageview_detail_share"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:src="@drawable/ic_share_24dp"
             tools:ignore="ContentDescription" />
@@ -37,13 +39,15 @@
         android:id="@+id/photoview_detail_photo"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="invisible" />
+        android:background="@color/detail_photo_background_color" />
 
     <ImageView
-        android:id="@+id/imageview_detail_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|center_vertical"
-        android:visibility="invisible"
+        android:id="@+id/imageview_status"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:visibility="visible"
+        app:srcCompat="@drawable/ic_progress_animated"
         tools:ignore="ContentDescription" />
+
 </FrameLayout>

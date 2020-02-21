@@ -8,20 +8,26 @@ import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 
 import ru.nbdev.mediadownloader.model.entity.pixabay.PixabayFilter;
 
-@StateStrategyType(SkipStrategy.class)
 public interface MainView extends MvpView {
 
+    @StateStrategyType( SkipStrategy.class)
     void runDetailActivity(int photoId);
 
     void updateRecyclerView();
 
+    @StateStrategyType( SkipStrategy.class)
     void showMessage(@StringRes int textId);
 
-    void showPhotosCount(int count);
+    @StateStrategyType( SkipStrategy.class)
+    void showMessage(@StringRes int textId, String text);
 
     void showFilterDialog(PixabayFilter filter);
+
+    void hideFilterDialog();
 
     void showProgress();
 
     void hideProgress();
+
+    void showError();
 }

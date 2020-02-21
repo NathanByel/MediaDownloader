@@ -8,7 +8,7 @@ import ru.nbdev.mediadownloader.model.entity.pixabay.PixabayApiPhotosList;
 public interface PixabayApiService {
 
     @GET("api")
-    Single<PixabayApiPhotosList> getPhotosList(
+    Single<PixabayApiPhotosList> getRandomPhotosList(
             @Query("key") String key,
             @Query("per_page") int perPage
     );

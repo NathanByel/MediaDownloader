@@ -2,24 +2,26 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="200dp">
+    android:layout_height="200dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ImageView
-        android:id="@+id/recycler_image"
+        android:id="@+id/imageview_photo"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
         tools:ignore="ContentDescription" />
 
-    <ProgressBar
-        android:id="@+id/progress_bar"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_gravity="center_horizontal|center_vertical"/>
+    <ImageView
+        android:id="@+id/imageview_status"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center_vertical|center_horizontal"
+        app:srcCompat="@drawable/ic_progress_animated"
+        tools:ignore="ContentDescription" />
 
     <LinearLayout
-        android:id="@+id/info_layout"
+        android:id="@+id/layout_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
@@ -32,26 +34,26 @@
         android:paddingBottom="8dp">
 
         <TextView
-            android:id="@+id/text_view_views"
+            android:id="@+id/textview_views"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1.4"
             android:drawableStart="@drawable/ic_eye_24dp"
             android:drawablePadding="4dp"
             android:singleLine="true"
-            android:textColor="@color/recycler_item_bottom_color"
+            android:textColor="@color/recycler_item_ic_bottom_color"
             android:textSize="18sp"
             tools:text="@string/mock_text" />
 
         <TextView
-            android:id="@+id/text_view_likes"
+            android:id="@+id/textview_likes"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:drawableStart="@drawable/ic_thumb_up_24dp"
             android:drawablePadding="4dp"
             android:singleLine="true"
-            android:textColor="@color/recycler_item_bottom_color"
+            android:textColor="@color/recycler_item_ic_bottom_color"
             android:textSize="18sp"
             tools:text="@string/mock_text" />
     </LinearLayout>

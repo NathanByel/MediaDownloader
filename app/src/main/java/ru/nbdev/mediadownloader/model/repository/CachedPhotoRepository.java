@@ -5,13 +5,12 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Maybe;
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import ru.nbdev.mediadownloader.model.cache.CacheRecord;
 import ru.nbdev.mediadownloader.model.cache.PhotoCacheProvider;
 import ru.nbdev.mediadownloader.model.entity.Photo;
 import ru.nbdev.mediadownloader.model.entity.SearchRequest;
@@ -21,16 +20,21 @@ public class CachedPhotoRepository implements PhotoRepository {
 
     private final PhotoCacheProvider cache;
     private final PhotoRepository photoRepository;
+    private final int cacheLifeTime;
+    private final int cacheLifeTimeUnits;
 
-    public CachedPhotoRepository(PhotoCacheProvider cache, PhotoRepository photoRepository) {
+    public CachedPhotoRepository(PhotoCacheProvider cache, PhotoRepository photoRepository, int cacheLifeTime, int cacheLifeTimeUnits) {
         this.cache = cache;
         this.photoRepository = photoRepository;
-        Disposable disposable = Observable.interval(10, TimeUnit.SECONDS, Schedulers.io())
-                .subscribe(aLong -> {
-                    Calendar calendar = GregorianCalendar.getInstance();
-                    calendar.roll(Calendar.MINUTE, -1);
-                    int deleted = cache.deleteRequestAndPhotosOlderThan(calendar.getTime());
-                    Timber.d("Drop cache %s. Deleted records %d", photoRepository.getServiceName(), deleted);
+        this.cacheLifeTime = cacheLifeTime;
+        this.cacheLifeTimeUnits = cacheLifeTimeUnits;
+
+        Disposable disposable = Single.fromCallable(() -> deleteOldRecords())
+                .observeOn(Schedulers.io())
+                .subscribe(deleted -> {
+                    Timber.d("Auto drop old cache %s. Deleted records %d", photoRepository.getServiceName(), deleted);
+                }, throwable -> {
+                    Timber.e("Auto drop old cache error, %s", throwable.getMessage());
                 });
     }
 
@@ -55,36 +59,43 @@ public class CachedPhotoRepository implements PhotoRepository {
     }
 
     private Single<List<Photo>> loadPhotos(SearchRequest request) {
-        return Maybe.concat(loadFromCache(request), loadFromInternet(request))
+        return Maybe.concat(loadPhotosFromCache(request), loadPhotosFromInternet(request))
                 .filter(photos -> photos != null && !photos.isEmpty())
                 .first(Collections.emptyList());
     }
 
-    private Maybe<List<Photo>> loadFromCache(SearchRequest request) {
+    private Maybe<List<Photo>> loadPhotosFromCache(SearchRequest request) {
         return Maybe.create(emitter -> {
             try {
-                Date date = cache.getRequestDate(request);
+                Date date = cache.getRecordDate(request);
                 if (date == null) {
-                    Timber.i("No request in cache");
+                    Timber.d("No record in cache");
                     emitter.onComplete();
                     return;
                 }
+                if (date.before(getRecordLifeEndDate())) {
+                    cache.deleteRecord(request);
+                    Timber.d("Old record in cache.");
+                    emitter.onComplete();
+                    return;
+                }
+
                 List<Photo> photos = cache.getPhotosByRequest(request);
                 emitter.onSuccess(photos);
             } catch (Exception e) {
-                Timber.e("loadFromCache() error. %s", e.getMessage());
+                Timber.e("loadPhotosFromCache() error. %s", e.getMessage());
                 emitter.onError(e);
             }
         });
     }
 
-    private Maybe<List<Photo>> loadFromInternet(SearchRequest request) {
+    private Maybe<List<Photo>> loadPhotosFromInternet(SearchRequest request) {
         return photoRepository.searchPhotos(request)
                 .doOnSuccess(photos -> {
                     saveRequestToCache(request, photos);
                 })
                 .doOnError(throwable -> {
-                    Timber.e("loadFromInternet() error. %s", throwable.getMessage());
+                    Timber.e("loadPhotosFromInternet() error. %s", throwable.getMessage());
                 })
                 .toMaybe();
     }
@@ -98,9 +109,9 @@ public class CachedPhotoRepository implements PhotoRepository {
     private Maybe<Photo> loadPhotoFromCache(int id) {
         return Maybe.create(emitter -> {
             try {
-                Photo photo = cache.getPhoto(id);
+                Photo photo = cache.getPhotoById(id);
                 if (photo == null) {
-                    Timber.i("No photo in cache");
+                    Timber.d("No photo in cache");
                     emitter.onComplete();
                     return;
                 }
@@ -116,7 +127,7 @@ public class CachedPhotoRepository implements PhotoRepository {
         return Maybe.fromSingle(photoRepository.getPhotoById(id)
                 .doOnSuccess(photo -> {
                     //FIXME saveRequestToCache(request, photo);
-                    Timber.e("loadPhotoFromInternet()");
+                    Timber.d("loadPhotoFromInternet()");
                 })
                 .doOnError(throwable -> {
                     Timber.e("loadPhotoFromInternet() error. %s", throwable.getMessage());
@@ -124,6 +135,19 @@ public class CachedPhotoRepository implements PhotoRepository {
     }
 
     private void saveRequestToCache(SearchRequest request, List<Photo> photos) {
-        cache.insertRequestAndPhotos(request, photos);
+        cache.insertRecord(new CacheRecord(request, photos));
+    }
+
+    private int deleteOldRecords() {
+        Date endDate = getRecordLifeEndDate();
+        int deleted = cache.deleteRecordsOlderThan(endDate);
+        Timber.d("Drop old cache %s. Deleted records %d", photoRepository.getServiceName(), deleted);
+        return deleted;
+    }
+
+    private Date getRecordLifeEndDate() {
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.roll(cacheLifeTimeUnits, -cacheLifeTime);
+        return calendar.getTime();
     }
 }

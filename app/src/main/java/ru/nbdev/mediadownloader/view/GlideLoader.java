@@ -11,8 +11,6 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
-import ru.nbdev.mediadownloader.R;
-
 public class GlideLoader {
 
     private final Context context;
@@ -25,7 +23,6 @@ public class GlideLoader {
         Glide
                 .with(context)
                 .load(url)
-                .placeholder(R.drawable.ic_progress_animated)
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {

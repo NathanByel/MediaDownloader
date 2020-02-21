@@ -5,6 +5,7 @@ import android.content.Context;
 import android.support.design.widget.BottomSheetDialog;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 
 import ru.nbdev.mediadownloader.R;
@@ -17,6 +18,7 @@ public class PixabayFilterSheet {
     private Spinner orderFilterSpinner;
     private Spinner imageTypeFilterSpinner;
     private Spinner categoryFilterSpinner;
+    private Button buttonShowResult;
 
     private MapList<PixabayFilter.Order, String> orderSpinnerMap;
     private MapList<PixabayFilter.ImageType, String> imageTypeSpinnerMap;
@@ -27,9 +29,11 @@ public class PixabayFilterSheet {
         orderFilterSpinner = bottomSheet.findViewById(R.id.spinner_order);
         imageTypeFilterSpinner = bottomSheet.findViewById(R.id.spinner_image_type);
         categoryFilterSpinner = bottomSheet.findViewById(R.id.spinner_image_category);
+        buttonShowResult = bottomSheet.findViewById(R.id.button_show_result);
 
         filterDialog = new BottomSheetDialog(activity);
         filterDialog.setContentView(bottomSheet);
+
         orderSpinnerInit(activity);
         imageTypeSpinnerInit(activity);
         categorySpinnerInit(activity);
@@ -104,18 +108,30 @@ public class PixabayFilterSheet {
         filterDialog.show();
     }
 
+    public void dismiss() {
+        filterDialog.dismiss();
+    }
+
+    public void setOnShowResultClickListener(OnShowResultClickListener listener) {
+        buttonShowResult.setOnClickListener(v -> listener.onClick(getNewFilter()));
+    }
+
     public void setOnDismissListener(OnDismissListener listener) {
-        filterDialog.setOnDismissListener(dialog -> {
-                    PixabayFilter.Order order = orderSpinnerMap.keyAt(orderFilterSpinner.getSelectedItemPosition());
-                    PixabayFilter.ImageType type = imageTypeSpinnerMap.keyAt(imageTypeFilterSpinner.getSelectedItemPosition());
-                    PixabayFilter.Category category = categorySpinnerMap.keyAt(categoryFilterSpinner.getSelectedItemPosition());
-                    PixabayFilter filter = new PixabayFilter(order, type, category);
-                    listener.onDismiss(filter);
-                }
-        );
+        filterDialog.setOnDismissListener(dialog -> listener.onDismiss(getNewFilter()));
+    }
+
+    private PixabayFilter getNewFilter() {
+        PixabayFilter.Order order = orderSpinnerMap.keyAt(orderFilterSpinner.getSelectedItemPosition());
+        PixabayFilter.ImageType type = imageTypeSpinnerMap.keyAt(imageTypeFilterSpinner.getSelectedItemPosition());
+        PixabayFilter.Category category = categorySpinnerMap.keyAt(categoryFilterSpinner.getSelectedItemPosition());
+        return new PixabayFilter(order, type, category);
     }
 
     public interface OnDismissListener {
         void onDismiss(PixabayFilter filter);
+    }
+
+    public interface OnShowResultClickListener {
+        void onClick(PixabayFilter filter);
     }
 }

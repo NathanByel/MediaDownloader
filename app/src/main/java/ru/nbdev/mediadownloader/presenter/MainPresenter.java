@@ -52,13 +52,10 @@ public class MainPresenter extends MvpPresenter<MainView> {
     }
 
     public void onRefresh() {
-        clearRecycler();
         searchPhotos(lastQuery, pixabayFilter);
     }
 
     public void onSearch(String query) {
-        lastQuery = query;
-        clearRecycler();
         searchPhotos(query, pixabayFilter);
     }
 
@@ -70,27 +67,35 @@ public class MainPresenter extends MvpPresenter<MainView> {
         pixabayFilter = filter;
     }
 
+    public void onFiltersShowResultClick(String query, PixabayFilter filter) {
+        pixabayFilter = filter;
+        getViewState().hideFilterDialog();
+        searchPhotos(query, pixabayFilter);
+    }
+
     private void searchPhotos(String query, PixabayFilter filter) {
+        lastQuery = query;
+        clearRecycler();
         getViewState().showProgress();
         SearchRequest request = new PixabaySearchRequest(query, filter);
         Disposable disposable = photoRepository.searchPhotos(request)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(photos -> {
-                    getViewState().hideProgress();
                     photosList = photos;
+                    getViewState().hideProgress();
                     updateRecycler();
                 }, throwable -> {
-                    getViewState().hideProgress();
-                    Timber.e("searchPhotos() from repository error. %s", throwable.getMessage());
+                    getViewState().showError();
                     getViewState().showMessage(R.string.load_error);
+                    Timber.e("searchPhotos() from repository error. %s", throwable.getMessage());
                 });
         compositeDisposable.add(disposable);
     }
 
     private void updateRecycler() {
         if (photosList != null) {
-            getViewState().showPhotosCount(photosList.size());
+            getViewState().showMessage(R.string.found, String.valueOf(photosList.size()));
             getViewState().updateRecyclerView();
         }
     }
@@ -116,14 +121,13 @@ public class MainPresenter extends MvpPresenter<MainView> {
         }
 
         @Override
-        public void bindView(MainRecyclerAdapter.MainRecyclerViewHolder mainRecyclerViewHolder) {
+        public void bindView(MainRecyclerAdapter.MainRecyclerViewHolderImpl mainRecyclerViewHolder) {
             Photo photo = photosList.get(mainRecyclerViewHolder.getAdapterPosition());
-            mainRecyclerViewHolder.setPhotoData(photo);
+            mainRecyclerViewHolder.showPhoto(photo);
             mainRecyclerViewHolder.setOnImageClickListener(v -> onItemClick((int) photo.id));
         }
 
-        @Override
-        public void onItemClick(int photoId) {
+        private void onItemClick(int photoId) {
             getViewState().runDetailActivity(photoId);
         }
     }

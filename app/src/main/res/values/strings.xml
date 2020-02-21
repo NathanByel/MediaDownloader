@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name" translatable="false">MediaDownloader</string>
-    <string name="photos_count">Found:</string>
+    <string name="found">Found:</string>
     <string name="search">Search</string>
     <string name="mock_text">Text</string>
     <string name="send_url">Send link</string>
@@ -39,4 +39,5 @@
     <string name="filter_buildings">Buildings</string>
     <string name="filter_business">Business</string>
     <string name="filter_music">Music</string>
+    <string name="show_result">Show result</string>
 </resources>

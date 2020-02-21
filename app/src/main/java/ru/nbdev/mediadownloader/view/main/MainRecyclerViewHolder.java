@@ -2,7 +2,7 @@ package ru.nbdev.mediadownloader.view.main;
 
 import ru.nbdev.mediadownloader.model.entity.Photo;
 
-public interface MainViewHolder {
+public interface MainRecyclerViewHolder {
 
-    void setPhotoData(Photo photo);
+    void showPhoto(Photo photo);
 }

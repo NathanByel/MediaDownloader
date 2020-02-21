@@ -33,7 +33,7 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
     private LinearLayout layoutTopPanel;
     private ImageView iconDownload;
     private ImageView iconShare;
-    private ImageView imageStatus;
+    private ImageView imageViewStatus;
 
     private Animation animationZoomInOut;
     private GlideLoader glideLoader;
@@ -82,11 +82,11 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
     }
 
     private void findViews() {
-        imageStatus = findViewById(R.id.imageview_detail_status);
         layoutTopPanel = findViewById(R.id.linearlayout_detail_toppanel);
-        iconDownload = findViewById(R.id.icon_detail_download);
-        iconShare = findViewById(R.id.icon_detail_share);
+        iconDownload = findViewById(R.id.imageview_detail_download);
+        iconShare = findViewById(R.id.imageview_detail_share);
         photoView = findViewById(R.id.photoview_detail_photo);
+        imageViewStatus = findViewById(R.id.imageview_status);
     }
 
     private void initAnimations() {
@@ -99,21 +99,21 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
 
     private void setLoadMode() {
         setTopPanelVisibility(false);
-        photoView.setVisibility(View.VISIBLE);
-        imageStatus.setImageResource(R.drawable.ic_progress_animated);
-        imageStatus.setVisibility(View.VISIBLE);
-    }
-
-    private void setErrorMode(String text) {
-        setTopPanelVisibility(false);
+        imageViewStatus.setImageResource(R.drawable.ic_progress_animated);
+        imageViewStatus.setVisibility(View.VISIBLE);
         photoView.setVisibility(View.INVISIBLE);
-        imageStatus.setImageResource(R.drawable.ic_error_outline_48dp);
-        showToast(text);
     }
 
-    private void setPhotoMode() {
+    private void setErrorMode() {
+        setTopPanelVisibility(false);
+        imageViewStatus.setImageResource(R.drawable.ic_broken_image_black_50dp);
+        imageViewStatus.setVisibility(View.VISIBLE);
+        photoView.setVisibility(View.INVISIBLE);
+    }
+
+    private void setReadyMode() {
         setTopPanelVisibility(true);
-        imageStatus.setVisibility(View.INVISIBLE);
+        imageViewStatus.setVisibility(View.INVISIBLE);
         photoView.setVisibility(View.VISIBLE);
     }
 
@@ -124,12 +124,13 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
             @Override
             public void onError(GlideException e) {
                 Timber.e("glideLoader.loadImage(), %s", e.toString());
-                setErrorMode(getResources().getString(R.string.load_error));
+                setErrorMode();
+                showMessage(R.string.load_error);
             }
 
             @Override
             public void onSuccess() {
-                setPhotoMode();
+                setReadyMode();
             }
         });
     }
@@ -175,6 +176,12 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
     @Override
     public void showMessage(int textId, String text) {
         showToast(getResources().getString(textId) + text);
+    }
+
+    @Override
+    public void showError() {
+        setErrorMode();
+        showMessage(R.string.load_error);
     }
 
     private void showToast(String text) {

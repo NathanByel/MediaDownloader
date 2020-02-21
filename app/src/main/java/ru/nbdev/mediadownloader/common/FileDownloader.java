@@ -11,16 +11,16 @@ import io.reactivex.Single;
 
 public class FileDownloader {
 
-    public Single<File> download(String fileUrl, File saveTo) {
+    public Single<File> download(String fileUrl, File outputFile) {
         return Single.create(emitter -> {
             try (BufferedInputStream inputStream = new BufferedInputStream(new URL(fileUrl).openStream());
-                 BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(saveTo))) {
+                 BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile))) {
 
                 int data;
                 while ((data = inputStream.read()) != -1) {
                     outputStream.write(data);
                 }
-                emitter.onSuccess(saveTo);
+                emitter.onSuccess(outputFile);
             } catch (IOException e) {
                 emitter.onError(e);
             }

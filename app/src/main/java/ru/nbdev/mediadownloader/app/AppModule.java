@@ -2,6 +2,8 @@ package ru.nbdev.mediadownloader.app;
 
 import android.app.Application;
 
+import java.util.Calendar;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -36,7 +38,7 @@ public class AppModule {
         PixabayApi pixabayApi = new PixabayApi(hostProvider);
         PhotoRepository repository = new PixabayRepository(pixabayApi.getService(), apiKeyProvider);
         PhotoCacheProvider photoCacheProvider = new RoomPhotoCacheProvider(application, repository.getServiceName());
-        return new CachedPhotoRepository(photoCacheProvider, repository);
+        return new CachedPhotoRepository(photoCacheProvider, repository, 1, Calendar.MINUTE);
     }
 
     @Provides

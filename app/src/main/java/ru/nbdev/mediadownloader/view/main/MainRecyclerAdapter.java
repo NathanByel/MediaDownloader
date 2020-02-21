@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.load.engine.GlideException;
@@ -18,8 +17,9 @@ import ru.nbdev.mediadownloader.R;
 import ru.nbdev.mediadownloader.model.entity.Photo;
 import ru.nbdev.mediadownloader.presenter.RecyclerPresenter;
 import ru.nbdev.mediadownloader.view.GlideLoader;
+import timber.log.Timber;
 
-public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapter.MainRecyclerViewHolder> {
+public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapter.MainRecyclerViewHolderImpl> {
 
     private final RecyclerPresenter recyclerPresenter;
     private final GlideLoader glideLoader;
@@ -31,15 +31,15 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
 
     @NonNull
     @Override
-    public MainRecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+    public MainRecyclerViewHolderImpl onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.recycler_item, viewGroup, false);
+                .inflate(R.layout.item_recycler_main, viewGroup, false);
 
-        return new MainRecyclerViewHolder(view);
+        return new MainRecyclerViewHolderImpl(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MainRecyclerViewHolder mainRecyclerViewHolder, int position) {
+    public void onBindViewHolder(@NonNull MainRecyclerViewHolderImpl mainRecyclerViewHolder, int position) {
         recyclerPresenter.bindView(mainRecyclerViewHolder);
     }
 
@@ -48,54 +48,63 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
         return recyclerPresenter.getItemCount();
     }
 
-    public class MainRecyclerViewHolder extends RecyclerView.ViewHolder implements MainViewHolder {
-        private final ImageView imageView;
-        private final ProgressBar progressBar;
-        private final View infoLayout;
-        private final TextView viewsTextView;
-        private final TextView likesTextView;
+    public class MainRecyclerViewHolderImpl extends RecyclerView.ViewHolder implements MainRecyclerViewHolder {
+        private final ImageView ivPhoto;
+        private final ImageView ivStatus;
+        private final View layoutInfo;
+        private final TextView tvViews;
+        private final TextView tvLikes;
 
-        public MainRecyclerViewHolder(@NonNull View itemView) {
+        public MainRecyclerViewHolderImpl(@NonNull View itemView) {
             super(itemView);
-            imageView = itemView.findViewById(R.id.recycler_image);
-            progressBar = itemView.findViewById(R.id.progress_bar);
-            infoLayout = itemView.findViewById(R.id.info_layout);
-            viewsTextView = itemView.findViewById(R.id.text_view_views);
-            likesTextView = itemView.findViewById(R.id.text_view_likes);
+            ivStatus = itemView.findViewById(R.id.imageview_status);
+            ivPhoto = itemView.findViewById(R.id.imageview_photo);
+            layoutInfo = itemView.findViewById(R.id.layout_info);
+            tvViews = itemView.findViewById(R.id.textview_views);
+            tvLikes = itemView.findViewById(R.id.textview_likes);
         }
 
         public void setOnImageClickListener(View.OnClickListener listener) {
-            imageView.setOnClickListener(listener);
+            ivPhoto.setOnClickListener(listener);
         }
 
         @Override
-        public void setPhotoData(Photo photo) {
-            //viewLoad();
-            glideLoader.loadImage(photo.previewURL, imageView, new GlideLoader.OnImageReadyListener() {
+        public void showPhoto(Photo photo) {
+            setLoadMode();
+            glideLoader.loadImage(photo.previewURL, ivPhoto, new GlideLoader.OnImageReadyListener() {
                 @Override
                 public void onError(GlideException e) {
-
+                    Timber.e("showPhoto() error. %s", e.getMessage());
+                    setErrorMode();
                 }
 
                 @Override
                 public void onSuccess() {
-                    viewsTextView.setText(formatNumberToString(photo.views));
-                    likesTextView.setText(formatNumberToString(photo.likes));
-                    viewResult();
+                    tvViews.setText(formatNumberToString(photo.views));
+                    tvLikes.setText(formatNumberToString(photo.likes));
+                    setReadyMode();
                 }
             });
         }
 
-        private void viewLoad() {
-            progressBar.setVisibility(View.VISIBLE);
-            imageView.setVisibility(View.INVISIBLE);
-            infoLayout.setVisibility(View.INVISIBLE);
+        private void setLoadMode() {
+            layoutInfo.setVisibility(View.INVISIBLE);
+            ivPhoto.setVisibility(View.INVISIBLE);
+            ivStatus.setImageResource(R.drawable.ic_progress_animated);
+            ivStatus.setVisibility(View.VISIBLE);
         }
 
-        private void viewResult() {
-            progressBar.setVisibility(View.INVISIBLE);
-            imageView.setVisibility(View.VISIBLE);
-            infoLayout.setVisibility(View.VISIBLE);
+        private void setReadyMode() {
+            layoutInfo.setVisibility(View.VISIBLE);
+            ivPhoto.setVisibility(View.VISIBLE);
+            ivStatus.setVisibility(View.INVISIBLE);
+        }
+
+        private void setErrorMode() {
+            layoutInfo.setVisibility(View.INVISIBLE);
+            ivPhoto.setVisibility(View.INVISIBLE);
+            ivStatus.setImageResource(R.drawable.ic_broken_image_black_50dp);
+            ivStatus.setVisibility(View.VISIBLE);
         }
 
         private String formatNumberToString(int number) {

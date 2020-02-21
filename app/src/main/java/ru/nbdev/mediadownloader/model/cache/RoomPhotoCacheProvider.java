@@ -6,10 +6,12 @@ import android.content.Context;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import ru.nbdev.mediadownloader.model.entity.Photo;
 import ru.nbdev.mediadownloader.model.entity.SearchRequest;
 import ru.nbdev.mediadownloader.model.room.AppDatabase;
+import ru.nbdev.mediadownloader.model.room.converters.MapTypeConverter;
 import ru.nbdev.mediadownloader.model.room.entity.DbPhoto;
 import ru.nbdev.mediadownloader.model.room.entity.DbSearchRequest;
 
@@ -22,22 +24,31 @@ public class RoomPhotoCacheProvider implements PhotoCacheProvider {
     }
 
     @Override
-    public int deleteRequestAndPhotosOlderThan(Date date) {
+    public int deleteRecordsOlderThan(Date date) {
         return database.photoCacheDao().deleteRequestAndPhotosOlderThan(date);
     }
 
     @Override
-    public Date getRequestDate(SearchRequest searchRequest) {
+    public Date getRecordDate(SearchRequest request) {
         return database.photoCacheDao().getRequestDate(
-                mapSearchRequestToDbSearchRequest(searchRequest)
+                request.getRequest(),
+                extraDataToJson(request.getExtraData())
         );
     }
 
     @Override
-    public void insertRequestAndPhotos(SearchRequest searchRequest, List<Photo> photos) {
+    public void insertRecord(CacheRecord record) {
         database.photoCacheDao().insertRequestAndPhotos(
-                mapSearchRequestToDbSearchRequest(searchRequest),
-                mapPhotosToDbPhotos(photos)
+                mapSearchRequestToDbSearchRequest(record.getSearchRequest()),
+                mapPhotosToDbPhotos(record.getPhotos())
+        );
+    }
+
+    @Override
+    public void deleteRecord(SearchRequest request) {
+        database.photoCacheDao().deleteRequest(
+                request.getRequest(),
+                extraDataToJson(request.getExtraData())
         );
     }
 
@@ -45,13 +56,14 @@ public class RoomPhotoCacheProvider implements PhotoCacheProvider {
     public List<Photo> getPhotosByRequest(SearchRequest searchRequest) {
         return mapDbPhotosToPhotos(
                 database.photoCacheDao().getPhotosByRequest(
-                        mapSearchRequestToDbSearchRequest(searchRequest)
+                        searchRequest.getRequest(),
+                        extraDataToJson(searchRequest.getExtraData())
                 )
         );
     }
 
     @Override
-    public Photo getPhoto(long id) {
+    public Photo getPhotoById(long id) {
         return mapDbPhotoToPhoto(
                 database.photoCacheDao().getPhotoById(id)
         );
@@ -101,5 +113,9 @@ public class RoomPhotoCacheProvider implements PhotoCacheProvider {
 
     private DbSearchRequest mapSearchRequestToDbSearchRequest(SearchRequest request) {
         return new DbSearchRequest(request.getRequest(), request.getExtraData());
+    }
+
+    public String extraDataToJson(Map<String, Object> extraData) {
+        return MapTypeConverter.fromMap(extraData);
     }
 }

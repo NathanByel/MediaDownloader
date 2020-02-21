@@ -10,7 +10,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.arellomobile.mvp.MvpAppCompatActivity;
@@ -31,7 +30,7 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, Swip
     private RecyclerView recyclerView;
     private MainRecyclerAdapter mainRecyclerAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private ProgressBar progressBar;
+    private ImageView imageViewStatus;
 
     private ImageView searchBarStartIcon;
     private ImageView searchBarFilterIcon;
@@ -83,14 +82,14 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, Swip
     }
 
     private void findViews() {
-        progressBar = findViewById(R.id.progress_bar);
+        imageViewStatus = findViewById(R.id.imageview_status);
         swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout_main);
         toolbar = findViewById(R.id.toolbar_main);
         recyclerView = findViewById(R.id.recycler_main);
 
-        searchBarStartIcon = findViewById(R.id.icon_search_bar_start);
-        searchBarFilterIcon = findViewById(R.id.icon_search_bar_filter);
-        editSearchQuery = findViewById(R.id.edit_search_bar_query);
+        searchBarStartIcon = findViewById(R.id.imageview_search_bar_start);
+        searchBarFilterIcon = findViewById(R.id.imageview_search_bar_filter);
+        editSearchQuery = findViewById(R.id.edittext_search_bar_query);
     }
 
     private void setupListeners() {
@@ -115,6 +114,8 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, Swip
         swipeRefreshLayout.setOnRefreshListener(this);
 
         pixabayFilterSheet.setOnDismissListener(filter -> presenter.onFiltersClosed(filter));
+
+        pixabayFilterSheet.setOnShowResultClickListener(filter -> presenter.onFiltersShowResultClick(editSearchQuery.getText().toString(), filter));
     }
 
     private void clearSearchBarFocus() {
@@ -143,13 +144,25 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, Swip
     }
 
     @Override
+    public void hideFilterDialog() {
+        pixabayFilterSheet.dismiss();
+    }
+
+    @Override
     public void showProgress() {
-        progressBar.setVisibility(View.VISIBLE);
+        imageViewStatus.setImageResource(R.drawable.ic_progress_animated);
+        imageViewStatus.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideProgress() {
-        progressBar.setVisibility(View.GONE);
+        imageViewStatus.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void showError() {
+        imageViewStatus.setImageResource(R.drawable.ic_broken_image_black_50dp);
+        imageViewStatus.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -170,7 +183,7 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, Swip
     }
 
     @Override
-    public void showPhotosCount(int count) {
-        showToast(getResources().getString(R.string.photos_count) + count);
+    public void showMessage(int textId, String text) {
+        showToast(getResources().getString(textId) + text);
     }
 }

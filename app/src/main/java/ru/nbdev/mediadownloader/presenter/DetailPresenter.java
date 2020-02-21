@@ -92,7 +92,7 @@ public class DetailPresenter extends MvpPresenter<DetailView> {
                         },
                         throwable -> {
                             Timber.e("loadPhotoById() error. %s", throwable.getMessage());
-                            getViewState().showMessage(R.string.load_error);
+                            getViewState().showError();
                         }
                 );
         compositeDisposable.add(disposable);
