@@ -15,7 +15,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
-        tools:ignore="GoogleAppIndexingWarning">
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="false" />
+
         <activity android:name="ru.nbdev.mediadownloader.view.detail.DetailActivity" />
         <activity android:name="ru.nbdev.mediadownloader.view.main.MainActivity">
             <intent-filter>

@@ -4,8 +4,6 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -13,12 +11,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.arellomobile.mvp.MvpAppCompatActivity;
-import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
+import androidx.annotation.NonNull;
+
 import com.bumptech.glide.load.engine.GlideException;
 import com.github.chrisbanes.photoview.PhotoView;
+import com.google.android.material.snackbar.Snackbar;
 
+import moxy.MvpAppCompatActivity;
+import moxy.presenter.InjectPresenter;
+import moxy.presenter.ProvidePresenter;
 import ru.nbdev.mediadownloader.R;
 import ru.nbdev.mediadownloader.app.App;
 import ru.nbdev.mediadownloader.common.Constants;
@@ -33,7 +34,7 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
     private LinearLayout layoutTopPanel;
     private ImageView iconDownload;
     private ImageView iconShare;
-    private ImageView imageViewStatus;
+    private ImageView imageStatus;
 
     private Animation animationZoomInOut;
     private GlideLoader glideLoader;
@@ -86,7 +87,7 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
         iconDownload = findViewById(R.id.imageview_detail_download);
         iconShare = findViewById(R.id.imageview_detail_share);
         photoView = findViewById(R.id.photoview_detail_photo);
-        imageViewStatus = findViewById(R.id.imageview_status);
+        imageStatus = findViewById(R.id.imageview_status);
     }
 
     private void initAnimations() {
@@ -99,21 +100,21 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
 
     private void setLoadMode() {
         setTopPanelVisibility(false);
-        imageViewStatus.setImageResource(R.drawable.ic_progress_animated);
-        imageViewStatus.setVisibility(View.VISIBLE);
+        imageStatus.setImageResource(R.drawable.ic_progress_animated);
+        imageStatus.setVisibility(View.VISIBLE);
         photoView.setVisibility(View.INVISIBLE);
     }
 
     private void setErrorMode() {
         setTopPanelVisibility(false);
-        imageViewStatus.setImageResource(R.drawable.ic_broken_image_black_50dp);
-        imageViewStatus.setVisibility(View.VISIBLE);
+        imageStatus.setImageResource(R.drawable.ic_broken_image_black_50dp);
+        imageStatus.setVisibility(View.VISIBLE);
         photoView.setVisibility(View.INVISIBLE);
     }
 
     private void setReadyMode() {
         setTopPanelVisibility(true);
-        imageViewStatus.setVisibility(View.INVISIBLE);
+        imageStatus.setVisibility(View.INVISIBLE);
         photoView.setVisibility(View.VISIBLE);
     }
 
@@ -123,7 +124,7 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
         glideLoader.loadImage(photo.fullSizeURL, photoView, new GlideLoader.OnImageReadyListener() {
             @Override
             public void onError(GlideException e) {
-                Timber.e("glideLoader.loadImage(), %s", e.toString());
+                Timber.e(e, "Detail view glideLoader.loadImage() error.");
                 setErrorMode();
                 showMessage(R.string.load_error);
             }

@@ -17,9 +17,9 @@ package ru.nbdev.mediadownloader.model.entity.pixabay;
 
 public class PixabayFilter {
 
-    private Order order;
-    private ImageType type;
-    private Category category;
+    private final Order order;
+    private final ImageType type;
+    private final Category category;
 
     public PixabayFilter() {
         order = Order.POPULAR;

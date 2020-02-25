@@ -1,7 +1,8 @@
 package ru.nbdev.mediadownloader.model.cache;
 
-import android.arch.persistence.room.Room;
 import android.content.Context;
+
+import androidx.room.Room;
 
 import java.util.ArrayList;
 import java.util.Date;

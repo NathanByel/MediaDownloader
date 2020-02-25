@@ -1,14 +1,13 @@
 package ru.nbdev.mediadownloader.presenter;
 
-import com.arellomobile.mvp.InjectViewState;
-import com.arellomobile.mvp.MvpPresenter;
-
 import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import moxy.InjectViewState;
+import moxy.MvpPresenter;
 import ru.nbdev.mediadownloader.R;
 import ru.nbdev.mediadownloader.common.MediaManager;
 import ru.nbdev.mediadownloader.model.entity.Photo;
@@ -20,8 +19,8 @@ import timber.log.Timber;
 public class DetailPresenter extends MvpPresenter<DetailView> {
 
     private final int photoId;
+    private final CompositeDisposable compositeDisposable;
     private Photo photo;
-    private CompositeDisposable compositeDisposable;
 
     @Inject
     MediaManager mediaManager;
@@ -91,7 +90,7 @@ public class DetailPresenter extends MvpPresenter<DetailView> {
                             getViewState().showPhoto(photo);
                         },
                         throwable -> {
-                            Timber.e("loadPhotoById() error. %s", throwable.getMessage());
+                            Timber.e(throwable, "Repository loadPhotoById() error.");
                             getViewState().showError();
                         }
                 );

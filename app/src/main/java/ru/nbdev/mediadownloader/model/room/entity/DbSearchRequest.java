@@ -1,11 +1,11 @@
 package ru.nbdev.mediadownloader.model.room.entity;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Index;
-import android.arch.persistence.room.PrimaryKey;
-import android.arch.persistence.room.TypeConverters;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Index;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
 
 import java.util.Date;
 import java.util.Map;
@@ -40,17 +40,5 @@ public class DbSearchRequest {
         date = new Date();
         this.request = request;
         this.extraData = extraData;
-    }
-
-    public String getRequest() {
-        return request;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public String getJsonExtraData() {
-        return MapTypeConverter.fromMap(extraData);
     }
 }

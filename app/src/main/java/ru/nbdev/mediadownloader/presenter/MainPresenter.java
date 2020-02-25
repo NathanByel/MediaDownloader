@@ -1,8 +1,5 @@
 package ru.nbdev.mediadownloader.presenter;
 
-import com.arellomobile.mvp.InjectViewState;
-import com.arellomobile.mvp.MvpPresenter;
-
 import java.util.List;
 
 import javax.inject.Inject;
@@ -11,6 +8,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import moxy.InjectViewState;
+import moxy.MvpPresenter;
 import ru.nbdev.mediadownloader.R;
 import ru.nbdev.mediadownloader.model.entity.Photo;
 import ru.nbdev.mediadownloader.model.entity.SearchRequest;
@@ -24,11 +23,11 @@ import timber.log.Timber;
 @InjectViewState
 public class MainPresenter extends MvpPresenter<MainView> {
 
-    private List<Photo> photosList;
     private final MainRecyclerPresenter mainRecyclerPresenter;
+    private final CompositeDisposable compositeDisposable;
+    private List<Photo> photosList;
     private PixabayFilter pixabayFilter;
     private String lastQuery;
-    private CompositeDisposable compositeDisposable;
 
     @Inject
     PhotoRepository photoRepository;
@@ -88,7 +87,7 @@ public class MainPresenter extends MvpPresenter<MainView> {
                 }, throwable -> {
                     getViewState().showError();
                     getViewState().showMessage(R.string.load_error);
-                    Timber.e("searchPhotos() from repository error. %s", throwable.getMessage());
+                    Timber.e(throwable, "Repository searchPhotos() error.");
                 });
         compositeDisposable.add(disposable);
     }

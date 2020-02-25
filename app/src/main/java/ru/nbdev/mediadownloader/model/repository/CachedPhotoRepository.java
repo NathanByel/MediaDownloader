@@ -30,11 +30,11 @@ public class CachedPhotoRepository implements PhotoRepository {
         this.cacheLifeTimeUnits = cacheLifeTimeUnits;
 
         Disposable disposable = Single.fromCallable(() -> deleteOldRecords())
-                .observeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io())
                 .subscribe(deleted -> {
                     Timber.d("Auto drop old cache %s. Deleted records %d", photoRepository.getServiceName(), deleted);
                 }, throwable -> {
-                    Timber.e("Auto drop old cache error, %s", throwable.getMessage());
+                    Timber.e(throwable, "Auto drop old cache error.");
                 });
     }
 
@@ -83,7 +83,7 @@ public class CachedPhotoRepository implements PhotoRepository {
                 List<Photo> photos = cache.getPhotosByRequest(request);
                 emitter.onSuccess(photos);
             } catch (Exception e) {
-                Timber.e("loadPhotosFromCache() error. %s", e.getMessage());
+                Timber.e(e, "CachedPhotoRepository loadPhotosFromCache() error.");
                 emitter.onError(e);
             }
         });
@@ -95,7 +95,7 @@ public class CachedPhotoRepository implements PhotoRepository {
                     saveRequestToCache(request, photos);
                 })
                 .doOnError(throwable -> {
-                    Timber.e("loadPhotosFromInternet() error. %s", throwable.getMessage());
+                    Timber.e(throwable, "CachedPhotoRepository loadPhotosFromInternet() error.");
                 })
                 .toMaybe();
     }
@@ -117,7 +117,7 @@ public class CachedPhotoRepository implements PhotoRepository {
                 }
                 emitter.onSuccess(photo);
             } catch (Exception e) {
-                Timber.e("loadPhotoFromCache() error. %s", e.getMessage());
+                Timber.e(e, "CachedPhotoRepository loadPhotoFromCache() error.");
                 emitter.onError(e);
             }
         });
@@ -130,7 +130,7 @@ public class CachedPhotoRepository implements PhotoRepository {
                     Timber.d("loadPhotoFromInternet()");
                 })
                 .doOnError(throwable -> {
-                    Timber.e("loadPhotoFromInternet() error. %s", throwable.getMessage());
+                    Timber.e(throwable, "CachedPhotoRepository loadPhotoFromInternet() error.");
                 }));
     }
 

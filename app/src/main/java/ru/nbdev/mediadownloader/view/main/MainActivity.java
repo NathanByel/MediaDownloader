@@ -2,20 +2,20 @@ package ru.nbdev.mediadownloader.view.main;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.arellomobile.mvp.MvpAppCompatActivity;
-import com.arellomobile.mvp.presenter.InjectPresenter;
-import com.arellomobile.mvp.presenter.ProvidePresenter;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import moxy.MvpAppCompatActivity;
+import moxy.presenter.InjectPresenter;
+import moxy.presenter.ProvidePresenter;
 import ru.nbdev.mediadownloader.R;
 import ru.nbdev.mediadownloader.app.App;
 import ru.nbdev.mediadownloader.common.Constants;
@@ -24,13 +24,13 @@ import ru.nbdev.mediadownloader.model.entity.pixabay.PixabayFilter;
 import ru.nbdev.mediadownloader.presenter.MainPresenter;
 import ru.nbdev.mediadownloader.view.detail.DetailActivity;
 
-public class MainActivity extends MvpAppCompatActivity implements MainView, SwipeRefreshLayout.OnRefreshListener {
+public class MainActivity extends MvpAppCompatActivity implements MainView {
 
     private Toolbar toolbar;
-    private RecyclerView recyclerView;
-    private MainRecyclerAdapter mainRecyclerAdapter;
+    private RecyclerView recycler;
+    private MainRecyclerAdapter recyclerAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private ImageView imageViewStatus;
+    private ImageView imageStatus;
 
     private ImageView searchBarStartIcon;
     private ImageView searchBarFilterIcon;
@@ -67,12 +67,6 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, Swip
     }
 
     @Override
-    public void onRefresh() {
-        swipeRefreshLayout.setRefreshing(false);
-        presenter.onRefresh();
-    }
-
-    @Override
     public void onBackPressed() {
         if (editSearchQuery.isFocused()) {
             clearSearchBarFocus();
@@ -82,10 +76,10 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, Swip
     }
 
     private void findViews() {
-        imageViewStatus = findViewById(R.id.imageview_status);
+        imageStatus = findViewById(R.id.imageview_status);
         swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout_main);
         toolbar = findViewById(R.id.toolbar_main);
-        recyclerView = findViewById(R.id.recycler_main);
+        recycler = findViewById(R.id.recycler_main);
 
         searchBarStartIcon = findViewById(R.id.imageview_search_bar_start);
         searchBarFilterIcon = findViewById(R.id.imageview_search_bar_filter);
@@ -111,7 +105,10 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, Swip
 
         searchBarFilterIcon.setOnClickListener(v -> presenter.onFilterIconClick());
 
-        swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            swipeRefreshLayout.setRefreshing(false);
+            presenter.onRefresh();
+        });
 
         pixabayFilterSheet.setOnDismissListener(filter -> presenter.onFiltersClosed(filter));
 
@@ -129,9 +126,9 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, Swip
 
     private void recyclerInit() {
         GridLayoutManager layoutManager = new GridLayoutManager(this, Constants.RECYCLER_COLUMNS);
-        recyclerView.setLayoutManager(layoutManager);
-        mainRecyclerAdapter = new MainRecyclerAdapter(this, presenter.getMainRecyclerPresenter());
-        recyclerView.setAdapter(mainRecyclerAdapter);
+        recycler.setLayoutManager(layoutManager);
+        recyclerAdapter = new MainRecyclerAdapter(this, presenter.getMainRecyclerPresenter());
+        recycler.setAdapter(recyclerAdapter);
     }
 
     private void showToast(String text) {
@@ -150,19 +147,19 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, Swip
 
     @Override
     public void showProgress() {
-        imageViewStatus.setImageResource(R.drawable.ic_progress_animated);
-        imageViewStatus.setVisibility(View.VISIBLE);
+        imageStatus.setImageResource(R.drawable.ic_progress_animated);
+        imageStatus.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideProgress() {
-        imageViewStatus.setVisibility(View.INVISIBLE);
+        imageStatus.setVisibility(View.INVISIBLE);
     }
 
     @Override
     public void showError() {
-        imageViewStatus.setImageResource(R.drawable.ic_broken_image_black_50dp);
-        imageViewStatus.setVisibility(View.VISIBLE);
+        imageStatus.setImageResource(R.drawable.ic_broken_image_black_50dp);
+        imageStatus.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -174,7 +171,7 @@ public class MainActivity extends MvpAppCompatActivity implements MainView, Swip
 
     @Override
     public void updateRecyclerView() {
-        mainRecyclerAdapter.notifyDataSetChanged();
+        recyclerAdapter.notifyDataSetChanged();
     }
 
     @Override

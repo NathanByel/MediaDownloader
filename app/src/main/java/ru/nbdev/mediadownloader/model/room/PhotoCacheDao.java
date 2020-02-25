@@ -1,11 +1,11 @@
 package ru.nbdev.mediadownloader.model.room;
 
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.OnConflictStrategy;
-import android.arch.persistence.room.Query;
-import android.arch.persistence.room.Transaction;
-import android.arch.persistence.room.TypeConverters;
+import androidx.room.Dao;
+import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
+import androidx.room.Query;
+import androidx.room.Transaction;
+import androidx.room.TypeConverters;
 
 import java.util.Date;
 import java.util.List;

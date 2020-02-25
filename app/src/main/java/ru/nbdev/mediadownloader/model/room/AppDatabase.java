@@ -1,7 +1,7 @@
 package ru.nbdev.mediadownloader.model.room;
 
-import android.arch.persistence.room.Database;
-import android.arch.persistence.room.RoomDatabase;
+import androidx.room.Database;
+import androidx.room.RoomDatabase;
 
 import ru.nbdev.mediadownloader.model.room.entity.DbJoinRequestAndPhotos;
 import ru.nbdev.mediadownloader.model.room.entity.DbPhoto;

@@ -14,7 +14,7 @@
 /captures
 .externalNativeBuild
 
-
+google-services.json
 /app/crashlytics.properties
 /app/fabric.properties
 /app/gradle.properties
