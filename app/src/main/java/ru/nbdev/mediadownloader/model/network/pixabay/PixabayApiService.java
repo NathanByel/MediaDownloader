@@ -10,12 +10,14 @@ public interface PixabayApiService {
     @GET("api")
     Single<PixabayApiPhotosList> getRandomPhotosList(
             @Query("key") String key,
+            @Query("safesearch") boolean safesearch,
             @Query("per_page") int perPage
     );
 
     @GET("api")
     Single<PixabayApiPhotosList> getPhotosList(
             @Query("key") String key,
+            @Query("safesearch") boolean safesearch,
             @Query("q") String query,
             @Query("image_type") String imageType,
             @Query("category") String category,

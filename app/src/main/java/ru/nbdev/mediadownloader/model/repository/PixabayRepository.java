@@ -13,7 +13,8 @@ import ru.nbdev.mediadownloader.model.network.pixabay.PixabayApiService;
 
 public class PixabayRepository implements PhotoRepository {
 
-    private static final String serviceName = "pixabay.com";
+    private static final String SERVICE_NAME = "pixabay.com";
+    private static final boolean SAFE_SEARCH = true;
 
     private final PixabayApiService api;
     private final ApiKeyProvider apiKeyProvider;
@@ -25,7 +26,7 @@ public class PixabayRepository implements PhotoRepository {
 
     @Override
     public String getServiceName() {
-        return serviceName;
+        return SERVICE_NAME;
     }
 
     @Override
@@ -41,6 +42,7 @@ public class PixabayRepository implements PhotoRepository {
     public Single<List<Photo>> getRandomPhotos() {
         return api.getRandomPhotosList(
                 apiKeyProvider.getApiKey(),
+                SAFE_SEARCH,
                 200
         )
                 .map(pixabayApiPhotosList -> mapApiPhotosToPhotos(pixabayApiPhotosList.hits));
@@ -52,6 +54,7 @@ public class PixabayRepository implements PhotoRepository {
             PixabaySearchRequest pixabayRequest = (PixabaySearchRequest) request;
             return api.getPhotosList(
                     apiKeyProvider.getApiKey(),
+                    SAFE_SEARCH,
                     pixabayRequest.getRequest(),
                     pixabayRequest.typeKey(),
                     pixabayRequest.categoryKey(),

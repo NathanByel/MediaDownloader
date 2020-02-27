@@ -38,7 +38,7 @@ public class AppModule {
         PixabayApi pixabayApi = new PixabayApi(hostProvider);
         PhotoRepository repository = new PixabayRepository(pixabayApi.getService(), apiKeyProvider);
         PhotoCacheProvider photoCacheProvider = new RoomPhotoCacheProvider(application, repository.getServiceName());
-        return new CachedPhotoRepository(photoCacheProvider, repository, 1, Calendar.MINUTE);
+        return new CachedPhotoRepository(photoCacheProvider, repository, 24, Calendar.HOUR);
     }
 
     @Provides

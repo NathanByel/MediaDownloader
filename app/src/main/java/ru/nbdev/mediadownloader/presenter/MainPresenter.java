@@ -1,5 +1,10 @@
 package ru.nbdev.mediadownloader.presenter;
 
+import android.os.Bundle;
+
+import com.google.android.gms.measurement.module.Analytics;
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -11,6 +16,7 @@ import io.reactivex.schedulers.Schedulers;
 import moxy.InjectViewState;
 import moxy.MvpPresenter;
 import ru.nbdev.mediadownloader.R;
+import ru.nbdev.mediadownloader.app.App;
 import ru.nbdev.mediadownloader.model.entity.Photo;
 import ru.nbdev.mediadownloader.model.entity.SearchRequest;
 import ru.nbdev.mediadownloader.model.entity.pixabay.PixabayFilter;
@@ -73,6 +79,10 @@ public class MainPresenter extends MvpPresenter<MainView> {
     }
 
     private void searchPhotos(String query, PixabayFilter filter) {
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM, query);
+        App.getFirebaseAnalytics().logEvent(FirebaseAnalytics.Event.SEARCH, bundle);
+        
         lastQuery = query;
         clearRecycler();
         getViewState().showProgress();

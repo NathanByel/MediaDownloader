@@ -147,7 +147,7 @@ public class CachedPhotoRepository implements PhotoRepository {
 
     private Date getRecordLifeEndDate() {
         Calendar calendar = GregorianCalendar.getInstance();
-        calendar.roll(cacheLifeTimeUnits, -cacheLifeTime);
+        calendar.add(cacheLifeTimeUnits, -cacheLifeTime);
         return calendar.getTime();
     }
 }

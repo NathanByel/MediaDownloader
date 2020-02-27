@@ -10,7 +10,8 @@
 /.idea/assetWizardSettings.xml
 /.idea/gradle.xml
 .DS_Store
-/build
+/app/build
+/app/release
 /captures
 .externalNativeBuild
 
