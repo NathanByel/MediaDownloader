@@ -3,7 +3,11 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
-    <!-- <color name="shadow_panel_color">#B3000000</color> -->
-    <color name="shadow_panel_color">#B300574B</color>
-    <color name="recycler_item_bottom_color">#B3FFFFFF</color>
+
+    <color name="shadow_panel_start_color">#B3000000</color>
+    <color name="shadow_panel_end_color">#33000000</color>
+    <color name="recycler_item_ic_bottom_color">#B3FFFFFF</color>
+    <color name="bottom_sheet_background_color">#FFFFFF</color>
+    <color name="detail_photo_background_color">#000000</color>
+    <color name="detail_background_color">#FFFFFF</color>
 </resources>
