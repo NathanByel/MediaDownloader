@@ -1,9 +1,11 @@
 package ru.nbdev.mediadownloader.view.main;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,9 +26,11 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
 
     private final RecyclerPresenter recyclerPresenter;
     private final GlideLoader glideLoader;
+    private final Context context;
 
     public MainRecyclerAdapter(Context context, RecyclerPresenter recyclerPresenter) {
         this.recyclerPresenter = recyclerPresenter;
+        this.context = context;
         glideLoader = new GlideLoader(context);
     }
 
@@ -92,6 +96,10 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
             layoutInfo.setVisibility(View.INVISIBLE);
             ivPhoto.setVisibility(View.INVISIBLE);
             ivStatus.setImageResource(R.drawable.ic_progress_animated);
+            // Fix API 23, 24 xml "animated-rotate" bug
+            if (Build.VERSION.SDK_INT == 23 || Build.VERSION.SDK_INT == 24) {
+                ivStatus.startAnimation(AnimationUtils.loadAnimation(context, R.anim.animation_rotate));
+            }
             ivStatus.setVisibility(View.VISIBLE);
         }
 

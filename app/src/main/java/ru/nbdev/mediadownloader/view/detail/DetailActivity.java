@@ -100,16 +100,20 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
 
     private void setLoadMode() {
         setTopPanelVisibility(false);
-        imageStatus.setImageResource(R.drawable.ic_progress_animated);
-        imageStatus.setVisibility(View.VISIBLE);
         photoView.setVisibility(View.INVISIBLE);
+        imageStatus.setImageResource(R.drawable.ic_progress_animated);
+        // Fix API 23, 24 xml "animated-rotate" bug
+        if (Build.VERSION.SDK_INT == 23 || Build.VERSION.SDK_INT == 24) {
+            imageStatus.startAnimation(AnimationUtils.loadAnimation(this, R.anim.animation_rotate));
+        }
+        imageStatus.setVisibility(View.VISIBLE);
     }
 
     private void setErrorMode() {
         setTopPanelVisibility(false);
+        photoView.setVisibility(View.INVISIBLE);
         imageStatus.setImageResource(R.drawable.ic_broken_image_black_50dp);
         imageStatus.setVisibility(View.VISIBLE);
-        photoView.setVisibility(View.INVISIBLE);
     }
 
     private void setReadyMode() {
@@ -157,6 +161,8 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
                     requestWriteStoragePermission();
                 }
             }
+        } else {
+            presenter.onWriteStoragePermissionReady(true);
         }
     }
 

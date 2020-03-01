@@ -35,7 +35,10 @@ public class AndroidMediaManager implements MediaManager {
         Intent share = new Intent(android.content.Intent.ACTION_SEND);
         share.setType("text/plain");
         share.putExtra(Intent.EXTRA_TEXT, photo.fullSizeURL);
-        context.startActivity(Intent.createChooser(share, context.getResources().getString(R.string.send_url)));
+
+        Intent chooser = Intent.createChooser(share, context.getResources().getString(R.string.send_url));
+        chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(chooser);
     }
 
     @Override

@@ -1,9 +1,11 @@
 package ru.nbdev.mediadownloader.view.main;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -148,6 +150,10 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
     @Override
     public void showProgress() {
         imageStatus.setImageResource(R.drawable.ic_progress_animated);
+        // Fix API 23, 24 xml "animated-rotate" bug
+        if (Build.VERSION.SDK_INT == 23 || Build.VERSION.SDK_INT == 24) {
+            imageStatus.startAnimation(AnimationUtils.loadAnimation(this, R.anim.animation_rotate));
+        }
         imageStatus.setVisibility(View.VISIBLE);
     }
 
