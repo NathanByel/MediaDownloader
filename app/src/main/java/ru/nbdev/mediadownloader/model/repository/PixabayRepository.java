@@ -15,9 +15,9 @@ public class PixabayRepository implements PhotoRepository {
 
     private static final String SERVICE_NAME = "pixabay.com";
     private static final boolean SAFE_SEARCH = true;
-
     private final PixabayApiService api;
     private final ApiKeyProvider apiKeyProvider;
+
 
     public PixabayRepository(PixabayApiService api, ApiKeyProvider apiKeyProvider) {
         this.api = api;
@@ -30,7 +30,7 @@ public class PixabayRepository implements PhotoRepository {
     }
 
     @Override
-    public Single<Photo> getPhotoById(int id) {
+    public Single<Photo> getPhotoById(long id) {
         return api.getPhotoById(
                 apiKeyProvider.getApiKey(),
                 id

@@ -1,8 +1,8 @@
 package ru.nbdev.mediadownloader.presenter;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
-import com.google.android.gms.measurement.module.Analytics;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.List;
@@ -17,6 +17,7 @@ import moxy.InjectViewState;
 import moxy.MvpPresenter;
 import ru.nbdev.mediadownloader.R;
 import ru.nbdev.mediadownloader.app.App;
+import ru.nbdev.mediadownloader.common.image_loader.ImageLoader;
 import ru.nbdev.mediadownloader.model.entity.Photo;
 import ru.nbdev.mediadownloader.model.entity.SearchRequest;
 import ru.nbdev.mediadownloader.model.entity.pixabay.PixabayFilter;
@@ -37,6 +38,10 @@ public class MainPresenter extends MvpPresenter<MainView> {
 
     @Inject
     PhotoRepository photoRepository;
+
+    @Inject
+    ImageLoader imageLoader;
+
 
     public MainPresenter() {
         lastQuery = "";
@@ -82,9 +87,9 @@ public class MainPresenter extends MvpPresenter<MainView> {
         Bundle bundle = new Bundle();
         bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM, query);
         App.getFirebaseAnalytics().logEvent(FirebaseAnalytics.Event.SEARCH, bundle);
-        
+
         lastQuery = query;
-        clearRecycler();
+        photosList = null;
         getViewState().showProgress();
         SearchRequest request = new PixabaySearchRequest(query, filter);
         Disposable disposable = photoRepository.searchPhotos(request)
@@ -92,51 +97,68 @@ public class MainPresenter extends MvpPresenter<MainView> {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(photos -> {
                     photosList = photos;
-                    getViewState().hideProgress();
-                    updateRecycler();
+                    getViewState().showResult();
+                    getViewState().showMessage(R.string.found, String.valueOf(photosList.size()));
                 }, throwable -> {
                     getViewState().showError();
                     getViewState().showMessage(R.string.load_error);
-                    Timber.e(throwable, "Repository searchPhotos() error.");
+                    Timber.e(throwable, "photoRepository.searchPhotos() error.");
                 });
         compositeDisposable.add(disposable);
-    }
-
-    private void updateRecycler() {
-        if (photosList != null) {
-            getViewState().showMessage(R.string.found, String.valueOf(photosList.size()));
-            getViewState().updateRecyclerView();
-        }
-    }
-
-    private void clearRecycler() {
-        if (photosList != null) {
-            photosList.clear();
-            getViewState().updateRecyclerView();
-        }
     }
 
     public MainRecyclerPresenter getMainRecyclerPresenter() {
         return mainRecyclerPresenter;
     }
 
+
     private class MainRecyclerPresenter implements RecyclerPresenter {
+
         @Override
         public int getItemCount() {
-            if (photosList != null) {
-                return photosList.size();
-            }
-            return 0;
+            return (photosList != null) ? photosList.size() : 0;
         }
 
         @Override
         public void bindView(MainRecyclerAdapter.MainRecyclerViewHolderImpl mainRecyclerViewHolder) {
-            Photo photo = photosList.get(mainRecyclerViewHolder.getAdapterPosition());
-            mainRecyclerViewHolder.showPhoto(photo);
-            mainRecyclerViewHolder.setOnImageClickListener(v -> onItemClick((int) photo.id));
+            Timber.d("bindView");
+            int position = mainRecyclerViewHolder.getAdapterPosition();
+            if (position < 0) {
+                return;
+            }
+
+            Photo photo = photosList.get(position);
+            mainRecyclerViewHolder.showProgress();
+
+            imageLoader.loadImageFromUrl(photo.previewURL, String.valueOf(position), new ImageLoader.OnReadyListener() {
+
+                @Override
+                public void onSuccess(Drawable image) {
+                    Timber.d("onResourceReady: bind pos %d, id %d, url %s", position, photo.id, photo.previewURL);
+                    photo.setDrawable(image);
+                    mainRecyclerViewHolder.showPhoto(photo);
+                    mainRecyclerViewHolder.setOnImageClickListener(v -> onItemClick(photo.id));
+                }
+
+                @Override
+                public void onError() {
+                    Timber.e("loadImageFromUrl() error.");
+                    mainRecyclerViewHolder.showError();
+                }
+            });
         }
 
-        private void onItemClick(int photoId) {
+        @Override
+        public void onViewRecycled(MainRecyclerAdapter.MainRecyclerViewHolderImpl holder) {
+            Timber.d("onViewRecycled");
+            int position = holder.getAdapterPosition();
+            if (position < 0) {
+                return;
+            }
+            imageLoader.cancelLoading(String.valueOf(position));
+        }
+
+        private void onItemClick(long photoId) {
             getViewState().runDetailActivity(photoId);
         }
     }

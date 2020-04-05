@@ -29,6 +29,6 @@ public interface PixabayApiService {
     @GET("api")
     Single<PixabayApiPhotosList> getPhotoById(
             @Query("key") String key,
-            @Query("id") int id
+            @Query("id") long id
     );
 }

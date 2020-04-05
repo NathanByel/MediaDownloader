@@ -1,4 +1,4 @@
-package ru.nbdev.mediadownloader.common;
+package ru.nbdev.mediadownloader.common.media_manager;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,12 +9,16 @@ import java.io.File;
 
 import io.reactivex.Single;
 import ru.nbdev.mediadownloader.R;
+import ru.nbdev.mediadownloader.common.FileDownloader;
 import ru.nbdev.mediadownloader.model.entity.Photo;
 
 public class AndroidMediaManager implements MediaManager {
 
-    private static final String DOWNLOAD_DIR = Environment.getExternalStorageDirectory() + File.separator + Environment.DIRECTORY_DOWNLOADS;
+    private static final String DOWNLOAD_DIR =
+            Environment.getExternalStorageDirectory() + File.separator + Environment.DIRECTORY_DOWNLOADS;
+
     private final Context context;
+
 
     public AndroidMediaManager(Context context) {
         this.context = context;

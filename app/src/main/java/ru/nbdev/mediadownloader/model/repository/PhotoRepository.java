@@ -14,5 +14,5 @@ public interface PhotoRepository {
 
     Single<List<Photo>> searchPhotos(SearchRequest request);
 
-    Single<Photo> getPhotoById(int id);
+    Single<Photo> getPhotoById(long id);
 }

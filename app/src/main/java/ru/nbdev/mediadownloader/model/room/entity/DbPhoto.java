@@ -23,6 +23,7 @@ public class DbPhoto {
     @ColumnInfo(name = "views")
     public int views;
 
+
     public DbPhoto(long id, String previewURL, String fullSizeURL, int likes, int views) {
         this.id = id;
         this.previewURL = previewURL;

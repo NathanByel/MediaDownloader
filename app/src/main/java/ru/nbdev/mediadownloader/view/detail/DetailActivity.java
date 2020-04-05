@@ -13,7 +13,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.bumptech.glide.load.engine.GlideException;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -25,8 +24,6 @@ import ru.nbdev.mediadownloader.app.App;
 import ru.nbdev.mediadownloader.common.Constants;
 import ru.nbdev.mediadownloader.model.entity.Photo;
 import ru.nbdev.mediadownloader.presenter.DetailPresenter;
-import ru.nbdev.mediadownloader.view.GlideLoader;
-import timber.log.Timber;
 
 public class DetailActivity extends MvpAppCompatActivity implements DetailView {
 
@@ -35,16 +32,15 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
     private ImageView iconDownload;
     private ImageView iconShare;
     private ImageView imageStatus;
-
     private Animation animationZoomInOut;
-    private GlideLoader glideLoader;
 
     @InjectPresenter
     DetailPresenter presenter;
 
+
     @ProvidePresenter
     DetailPresenter provideDetailPresenter() {
-        int photoId = getIntent().getIntExtra(Constants.EXTRA_PHOTO_ID_INT, Constants.WRONG_PHOTO_ID);
+        long photoId = getIntent().getLongExtra(Constants.EXTRA_PHOTO_ID_LONG, Constants.WRONG_PHOTO_ID);
 
         DetailPresenter detailPresenter = new DetailPresenter(photoId);
         App.getAppComponent().inject(detailPresenter);
@@ -59,9 +55,6 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
         findViews();
         initAnimations();
         setupListeners();
-
-        glideLoader = new GlideLoader(this);
-        setLoadMode();
     }
 
     @Override
@@ -70,80 +63,35 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
         presenter.onDestroy();
     }
 
-    private void setupListeners() {
-        iconDownload.setOnClickListener(v -> {
-            iconDownload.startAnimation(animationZoomInOut);
-            presenter.onSaveClick();
-        });
-
-        iconShare.setOnClickListener(v -> {
-            iconShare.startAnimation(animationZoomInOut);
-            presenter.onShareClick();
-        });
-    }
-
-    private void findViews() {
-        layoutTopPanel = findViewById(R.id.linearlayout_detail_toppanel);
-        iconDownload = findViewById(R.id.imageview_detail_download);
-        iconShare = findViewById(R.id.imageview_detail_share);
-        photoView = findViewById(R.id.photoview_detail_photo);
-        imageStatus = findViewById(R.id.imageview_status);
-    }
-
-    private void initAnimations() {
-        animationZoomInOut = AnimationUtils.loadAnimation(this, R.anim.animation_zoom_in_out);
-    }
-
-    private void setTopPanelVisibility(boolean visibility) {
-        layoutTopPanel.setVisibility(visibility ? View.VISIBLE : View.INVISIBLE);
-    }
-
-    private void setLoadMode() {
+    @Override
+    public void showProgress() {
         setTopPanelVisibility(false);
         photoView.setVisibility(View.INVISIBLE);
-        imageStatus.setImageResource(R.drawable.ic_progress_animated);
-        // Fix API 23, 24 xml "animated-rotate" bug
-        if (Build.VERSION.SDK_INT == 23 || Build.VERSION.SDK_INT == 24) {
-            imageStatus.startAnimation(AnimationUtils.loadAnimation(this, R.anim.animation_rotate));
-        }
-        imageStatus.setVisibility(View.VISIBLE);
-    }
 
-    private void setErrorMode() {
-        setTopPanelVisibility(false);
-        photoView.setVisibility(View.INVISIBLE);
-        imageStatus.setImageResource(R.drawable.ic_broken_image_black_50dp);
+        imageStatus.clearAnimation();
+        imageStatus.setImageResource(R.drawable.ic_progress);
+        imageStatus.startAnimation(AnimationUtils.loadAnimation(this, R.anim.progress_animation));
         imageStatus.setVisibility(View.VISIBLE);
-    }
-
-    private void setReadyMode() {
-        setTopPanelVisibility(true);
-        imageStatus.setVisibility(View.INVISIBLE);
-        photoView.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void showPhoto(Photo photo) {
-        setLoadMode();
-        glideLoader.loadImage(photo.fullSizeURL, photoView, new GlideLoader.OnImageReadyListener() {
-            @Override
-            public void onError(GlideException e) {
-                Timber.e(e, "Detail view glideLoader.loadImage() error.");
-                setErrorMode();
-                showMessage(R.string.load_error);
-            }
+        imageStatus.clearAnimation();
+        imageStatus.setVisibility(View.INVISIBLE);
 
-            @Override
-            public void onSuccess() {
-                setReadyMode();
-            }
-        });
+        setTopPanelVisibility(true);
+        photoView.setImageDrawable(photo.getDrawable());
+        photoView.setVisibility(View.VISIBLE);
     }
 
-    private void requestWriteStoragePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_EXTERNAL_STORAGE);
-        }
+    @Override
+    public void showError() {
+        setTopPanelVisibility(false);
+        photoView.setVisibility(View.INVISIBLE);
+
+        imageStatus.clearAnimation();
+        imageStatus.setImageResource(R.drawable.ic_broken_image_black_50dp);
+        imageStatus.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -177,21 +125,45 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
 
     @Override
     public void showMessage(int textId) {
-        showToast(getResources().getString(textId));
+        Toast.makeText(this, getResources().getString(textId), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void showMessage(int textId, String text) {
-        showToast(getResources().getString(textId) + text);
+        Toast.makeText(this, getResources().getString(textId) + text, Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    public void showError() {
-        setErrorMode();
-        showMessage(R.string.load_error);
+    private void setupListeners() {
+        iconDownload.setOnClickListener(v -> {
+            iconDownload.startAnimation(animationZoomInOut);
+            presenter.onSaveClick();
+        });
+
+        iconShare.setOnClickListener(v -> {
+            iconShare.startAnimation(animationZoomInOut);
+            presenter.onShareClick();
+        });
     }
 
-    private void showToast(String text) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+    private void findViews() {
+        layoutTopPanel = findViewById(R.id.linearlayout_detail_toppanel);
+        iconDownload = findViewById(R.id.imageview_detail_download);
+        iconShare = findViewById(R.id.imageview_detail_share);
+        photoView = findViewById(R.id.photoview_detail_photo);
+        imageStatus = findViewById(R.id.imageview_status);
+    }
+
+    private void initAnimations() {
+        animationZoomInOut = AnimationUtils.loadAnimation(this, R.anim.animation_zoom_in_out);
+    }
+
+    private void setTopPanelVisibility(boolean visibility) {
+        layoutTopPanel.setVisibility(visibility ? View.VISIBLE : View.INVISIBLE);
+    }
+
+    private void requestWriteStoragePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_WRITE_EXTERNAL_STORAGE);
+        }
     }
 }

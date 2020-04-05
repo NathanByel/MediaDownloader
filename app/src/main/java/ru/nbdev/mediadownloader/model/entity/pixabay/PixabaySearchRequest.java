@@ -13,6 +13,7 @@ public class PixabaySearchRequest extends SearchRequest {
     private static final String TYPE = "type";
     private static final String CATEGORY = "category";
 
+
     public PixabaySearchRequest(@NonNull String request, PixabayFilter filter) {
         super(request);
         Map<String, Object> map = new HashMap<>();

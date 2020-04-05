@@ -1,4 +1,4 @@
-package ru.nbdev.mediadownloader.common;
+package ru.nbdev.mediadownloader.common.media_manager;
 
 import java.io.File;
 

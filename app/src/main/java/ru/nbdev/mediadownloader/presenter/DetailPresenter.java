@@ -1,5 +1,7 @@
 package ru.nbdev.mediadownloader.presenter;
 
+import android.graphics.drawable.Drawable;
+
 import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -9,7 +11,8 @@ import io.reactivex.schedulers.Schedulers;
 import moxy.InjectViewState;
 import moxy.MvpPresenter;
 import ru.nbdev.mediadownloader.R;
-import ru.nbdev.mediadownloader.common.MediaManager;
+import ru.nbdev.mediadownloader.common.image_loader.ImageLoader;
+import ru.nbdev.mediadownloader.common.media_manager.MediaManager;
 import ru.nbdev.mediadownloader.model.entity.Photo;
 import ru.nbdev.mediadownloader.model.repository.PhotoRepository;
 import ru.nbdev.mediadownloader.view.detail.DetailView;
@@ -18,7 +21,8 @@ import timber.log.Timber;
 @InjectViewState
 public class DetailPresenter extends MvpPresenter<DetailView> {
 
-    private final int photoId;
+    private final String IMAGE_LOADER_TAG = "DetailPresenter";
+    private final long photoId;
     private final CompositeDisposable compositeDisposable;
     private Photo photo;
 
@@ -26,9 +30,13 @@ public class DetailPresenter extends MvpPresenter<DetailView> {
     MediaManager mediaManager;
 
     @Inject
+    ImageLoader imageLoader;
+
+    @Inject
     PhotoRepository photoRepository;
 
-    public DetailPresenter(int photoId) {
+
+    public DetailPresenter(long photoId) {
         this.photoId = photoId;
         compositeDisposable = new CompositeDisposable();
     }
@@ -46,6 +54,7 @@ public class DetailPresenter extends MvpPresenter<DetailView> {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        imageLoader.cancelLoading(IMAGE_LOADER_TAG);
         compositeDisposable.clear();
     }
 
@@ -80,20 +89,40 @@ public class DetailPresenter extends MvpPresenter<DetailView> {
         }
     }
 
-    private void loadPhotoById(int id) {
+    private void loadPhotoById(long id) {
+        getViewState().showProgress();
         Disposable disposable = photoRepository.getPhotoById(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         photo -> {
                             this.photo = photo;
-                            getViewState().showPhoto(photo);
+                            showPhoto(photo);
                         },
                         throwable -> {
-                            Timber.e(throwable, "Repository loadPhotoById() error.");
+                            Timber.e(throwable, "photoRepository.loadPhotoById() error.");
                             getViewState().showError();
+                            getViewState().showMessage(R.string.load_error);
                         }
                 );
         compositeDisposable.add(disposable);
+    }
+
+    private void showPhoto(Photo photo) {
+        imageLoader.loadImageFromUrl(photo.fullSizeURL, IMAGE_LOADER_TAG, new ImageLoader.OnReadyListener() {
+
+            @Override
+            public void onSuccess(Drawable image) {
+                photo.setDrawable(image);
+                getViewState().showPhoto(photo);
+            }
+
+            @Override
+            public void onError() {
+                Timber.e("imageLoader.loadImage() error.");
+                getViewState().showError();
+                getViewState().showMessage(R.string.load_error);
+            }
+        });
     }
 }

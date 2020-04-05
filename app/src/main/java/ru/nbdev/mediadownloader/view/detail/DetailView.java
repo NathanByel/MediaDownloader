@@ -11,7 +11,11 @@ import ru.nbdev.mediadownloader.model.entity.Photo;
 @StateStrategyType(AddToEndStrategy.class)
 public interface DetailView extends MvpView {
 
+    void showProgress();
+
     void showPhoto(Photo photo);
+
+    void showError();
 
     @StateStrategyType(SkipStrategy.class)
     void checkWriteStoragePermissions();
@@ -21,6 +25,4 @@ public interface DetailView extends MvpView {
 
     @StateStrategyType(SkipStrategy.class)
     void showMessage(@StringRes int textId, String text);
-
-    void showError();
 }

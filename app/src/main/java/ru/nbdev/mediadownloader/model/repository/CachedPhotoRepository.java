@@ -23,6 +23,7 @@ public class CachedPhotoRepository implements PhotoRepository {
     private final int cacheLifeTime;
     private final int cacheLifeTimeUnits;
 
+
     public CachedPhotoRepository(PhotoCacheProvider cache, PhotoRepository photoRepository, int cacheLifeTime, int cacheLifeTimeUnits) {
         this.cache = cache;
         this.photoRepository = photoRepository;
@@ -44,7 +45,7 @@ public class CachedPhotoRepository implements PhotoRepository {
     }
 
     @Override
-    public Single<Photo> getPhotoById(int id) {
+    public Single<Photo> getPhotoById(long id) {
         return loadPhoto(id);
     }
 
@@ -91,22 +92,19 @@ public class CachedPhotoRepository implements PhotoRepository {
 
     private Maybe<List<Photo>> loadPhotosFromInternet(SearchRequest request) {
         return photoRepository.searchPhotos(request)
-                .doOnSuccess(photos -> {
-                    saveRequestToCache(request, photos);
-                })
-                .doOnError(throwable -> {
-                    Timber.e(throwable, "CachedPhotoRepository loadPhotosFromInternet() error.");
-                })
+                .doOnSuccess(photos -> saveRequestToCache(request, photos))
+                .doOnError(throwable -> Timber.e(throwable, "CachedPhotoRepository loadPhotosFromInternet() error."))
                 .toMaybe();
     }
 
-    private Single<Photo> loadPhoto(int id) {
+    @SuppressWarnings("Convert2MethodRef")
+    private Single<Photo> loadPhoto(long id) {
         return Maybe.concat(loadPhotoFromCache(id), loadPhotoFromInternet(id))
                 .filter(photo -> photo != null)
                 .first(new Photo());
     }
 
-    private Maybe<Photo> loadPhotoFromCache(int id) {
+    private Maybe<Photo> loadPhotoFromCache(long id) {
         return Maybe.create(emitter -> {
             try {
                 Photo photo = cache.getPhotoById(id);
@@ -123,15 +121,14 @@ public class CachedPhotoRepository implements PhotoRepository {
         });
     }
 
-    private Maybe<Photo> loadPhotoFromInternet(int id) {
+    private Maybe<Photo> loadPhotoFromInternet(long id) {
         return Maybe.fromSingle(photoRepository.getPhotoById(id)
                 .doOnSuccess(photo -> {
-                    //FIXME saveRequestToCache(request, photo);
+                    //TODO Подумать, надо-ли сохранять в кэш отдельные фото
                     Timber.d("loadPhotoFromInternet()");
                 })
-                .doOnError(throwable -> {
-                    Timber.e(throwable, "CachedPhotoRepository loadPhotoFromInternet() error.");
-                }));
+                .doOnError(throwable -> Timber.e(throwable, "CachedPhotoRepository loadPhotoFromInternet() error."))
+        );
     }
 
     private void saveRequestToCache(SearchRequest request, List<Photo> photos) {

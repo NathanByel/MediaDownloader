@@ -12,6 +12,7 @@ public class PixabayApi {
 
     private final HostProvider hostProvider;
 
+
     public PixabayApi(HostProvider hostProvider) {
         this.hostProvider = hostProvider;
     }

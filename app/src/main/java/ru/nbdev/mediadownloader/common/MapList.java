@@ -7,6 +7,7 @@ public class MapList<K, V> {
 
     private final List<Item> list;
 
+
     public MapList() {
         list = new ArrayList<>();
     }
@@ -63,6 +64,7 @@ public class MapList<K, V> {
 
         return vList;
     }
+
 
     private class Item {
         final K key;
