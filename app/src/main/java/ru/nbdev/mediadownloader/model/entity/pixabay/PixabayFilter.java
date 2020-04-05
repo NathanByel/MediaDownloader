@@ -21,6 +21,7 @@ public class PixabayFilter {
     private final ImageType type;
     private final Category category;
 
+
     public PixabayFilter() {
         order = Order.POPULAR;
         type = ImageType.ALL;
@@ -57,6 +58,7 @@ public class PixabayFilter {
         return category.getKey();
     }
 
+
     public enum Order {
         POPULAR("popular"),
         LATEST("latest");
@@ -71,6 +73,7 @@ public class PixabayFilter {
             return key;
         }
     }
+
 
     public enum ImageType {
         ALL("all"),
@@ -88,6 +91,7 @@ public class PixabayFilter {
             return key;
         }
     }
+
 
     public enum Category {
         ALL(""),

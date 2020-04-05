@@ -16,6 +16,7 @@ public class App extends Application {
     private static AppComponent appComponent;
     private static FirebaseAnalytics firebaseAnalytics;
 
+
     @Override
     public void onCreate() {
         super.onCreate();

@@ -7,4 +7,6 @@ public interface RecyclerPresenter {
     int getItemCount();
 
     void bindView(MainRecyclerAdapter.MainRecyclerViewHolderImpl mainRecyclerViewHolder);
+
+    void onViewRecycled(MainRecyclerAdapter.MainRecyclerViewHolderImpl holder);
 }

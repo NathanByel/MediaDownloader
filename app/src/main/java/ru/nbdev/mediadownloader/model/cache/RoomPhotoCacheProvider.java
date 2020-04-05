@@ -20,6 +20,7 @@ public class RoomPhotoCacheProvider implements PhotoCacheProvider {
 
     private final AppDatabase database;
 
+
     public RoomPhotoCacheProvider(Context context, String cacheName) {
         database = Room.databaseBuilder(context, AppDatabase.class, "cache_" + cacheName).build();
     }
@@ -70,6 +71,10 @@ public class RoomPhotoCacheProvider implements PhotoCacheProvider {
         );
     }
 
+    public String extraDataToJson(Map<String, Object> extraData) {
+        return MapTypeConverter.fromMap(extraData);
+    }
+
     private List<Photo> mapDbPhotosToPhotos(List<DbPhoto> dbPhotos) {
         List<Photo> list = new ArrayList<>(dbPhotos.size());
         for (DbPhoto dbPhoto : dbPhotos) {
@@ -114,9 +119,5 @@ public class RoomPhotoCacheProvider implements PhotoCacheProvider {
 
     private DbSearchRequest mapSearchRequestToDbSearchRequest(SearchRequest request) {
         return new DbSearchRequest(request.getRequest(), request.getExtraData());
-    }
-
-    public String extraDataToJson(Map<String, Object> extraData) {
-        return MapTypeConverter.fromMap(extraData);
     }
 }

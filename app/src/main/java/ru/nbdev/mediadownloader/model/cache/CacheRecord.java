@@ -6,8 +6,10 @@ import ru.nbdev.mediadownloader.model.entity.Photo;
 import ru.nbdev.mediadownloader.model.entity.SearchRequest;
 
 public class CacheRecord {
+
     private final SearchRequest searchRequest;
     private final List<Photo> photos;
+
 
     public CacheRecord(SearchRequest searchRequest, List<Photo> photos) {
         this.searchRequest = searchRequest;

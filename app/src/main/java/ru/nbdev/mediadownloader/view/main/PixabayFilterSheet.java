@@ -25,6 +25,7 @@ public class PixabayFilterSheet {
     private MapList<PixabayFilter.ImageType, String> imageTypeSpinnerMap;
     private MapList<PixabayFilter.Category, String> categorySpinnerMap;
 
+
     public PixabayFilterSheet(Activity activity) {
         View bottomSheet = activity.getLayoutInflater().inflate(R.layout.bottom_sheet_main, null);
         orderSpinner = bottomSheet.findViewById(R.id.spinner_order);

@@ -36,6 +36,7 @@ public class DbSearchRequest {
     @ColumnInfo(name = "extra_data")
     public Map<String, Object> extraData;
 
+
     public DbSearchRequest(@NonNull String request, Map<String, Object> extraData) {
         date = new Date();
         this.request = request;
