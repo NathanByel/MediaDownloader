@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import moxy.MvpAppCompatActivity;
@@ -30,7 +32,7 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
     private RecyclerView recycler;
     private MainRecyclerAdapter recyclerAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private ImageView imageStatus;
+    private ImageView ivStatus;
 
     private ImageView searchBarStartIcon;
     private ImageView searchBarFilterIcon;
@@ -40,6 +42,7 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
 
     @InjectPresenter
     MainPresenter presenter;
+
 
     @ProvidePresenter
     MainPresenter provideMainPresenter() {
@@ -76,7 +79,7 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
     }
 
     private void findViews() {
-        imageStatus = findViewById(R.id.imageview_status);
+        ivStatus = findViewById(R.id.imageview_status);
         swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout_main);
         toolbar = findViewById(R.id.toolbar_main);
         recycler = findViewById(R.id.recycler_main);
@@ -147,31 +150,42 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
 
     @Override
     public void showProgress() {
-        imageStatus.setImageResource(R.drawable.ic_progress_animated);
-        imageStatus.setVisibility(View.VISIBLE);
+        recycler.setVisibility(View.INVISIBLE);
+
+        // Android API 23, 24 have "animated-rotate" bug in xml.
+        // So, we use animation.
+        ivStatus.clearAnimation();
+        ivStatus.setImageResource(R.drawable.ic_progress);
+        ivStatus.startAnimation(AnimationUtils.loadAnimation(this, R.anim.progress_animation));
+        ivStatus.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void hideProgress() {
-        imageStatus.setVisibility(View.INVISIBLE);
+    public void showResult() {
+        ivStatus.clearAnimation();
+        ivStatus.setVisibility(View.INVISIBLE);
+        recycler.setVisibility(View.VISIBLE);
+        updatePhotosList();
     }
 
     @Override
     public void showError() {
-        imageStatus.setImageResource(R.drawable.ic_broken_image_black_50dp);
-        imageStatus.setVisibility(View.VISIBLE);
+        recycler.setVisibility(View.INVISIBLE);
+        ivStatus.clearAnimation();
+        ivStatus.setImageResource(R.drawable.ic_broken_image_black_50dp);
+        ivStatus.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void runDetailActivity(int photoId) {
-        Intent intent = new Intent(this, DetailActivity.class);
-        intent.putExtra(Constants.EXTRA_PHOTO_ID_INT, photoId);
-        startActivity(intent);
-    }
-
-    @Override
-    public void updateRecyclerView() {
+    public void updatePhotosList() {
         recyclerAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void runDetailActivity(long photoId) {
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra(Constants.EXTRA_PHOTO_ID_LONG, photoId);
+        startActivity(intent);
     }
 
     @Override

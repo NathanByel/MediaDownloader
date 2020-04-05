@@ -12,9 +12,7 @@ import ru.nbdev.mediadownloader.model.entity.pixabay.PixabayFilter;
 public interface MainView extends MvpView {
 
     @StateStrategyType(SkipStrategy.class)
-    void runDetailActivity(int photoId);
-
-    void updateRecyclerView();
+    void runDetailActivity(long photoId);
 
     @StateStrategyType(SkipStrategy.class)
     void showMessage(@StringRes int textId);
@@ -24,11 +22,13 @@ public interface MainView extends MvpView {
 
     void showFilterDialog(PixabayFilter filter);
 
+    void updatePhotosList();
+
     void hideFilterDialog();
 
     void showProgress();
 
-    void hideProgress();
+    void showResult();
 
     void showError();
 }

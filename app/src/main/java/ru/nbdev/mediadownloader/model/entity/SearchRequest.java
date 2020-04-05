@@ -9,6 +9,7 @@ public class SearchRequest {
     private String request;
     protected Map<String, Object> extraData;
 
+
     public SearchRequest(@NonNull String request) {
         this(request, null);
     }

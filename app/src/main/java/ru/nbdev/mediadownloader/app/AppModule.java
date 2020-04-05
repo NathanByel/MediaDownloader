@@ -2,14 +2,15 @@ package ru.nbdev.mediadownloader.app;
 
 import android.app.Application;
 
-import java.util.Calendar;
-
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import ru.nbdev.mediadownloader.common.AndroidMediaManager;
-import ru.nbdev.mediadownloader.common.MediaManager;
+import ru.nbdev.mediadownloader.common.Constants;
+import ru.nbdev.mediadownloader.common.image_loader.GlideImageLoader;
+import ru.nbdev.mediadownloader.common.image_loader.ImageLoader;
+import ru.nbdev.mediadownloader.common.media_manager.AndroidMediaManager;
+import ru.nbdev.mediadownloader.common.media_manager.MediaManager;
 import ru.nbdev.mediadownloader.model.cache.PhotoCacheProvider;
 import ru.nbdev.mediadownloader.model.cache.RoomPhotoCacheProvider;
 import ru.nbdev.mediadownloader.model.network.ApiKeyProvider;
@@ -26,6 +27,7 @@ public class AppModule {
 
     private final Application application;
 
+
     public AppModule(Application application) {
         this.application = application;
     }
@@ -38,12 +40,23 @@ public class AppModule {
         PixabayApi pixabayApi = new PixabayApi(hostProvider);
         PhotoRepository repository = new PixabayRepository(pixabayApi.getService(), apiKeyProvider);
         PhotoCacheProvider photoCacheProvider = new RoomPhotoCacheProvider(application, repository.getServiceName());
-        return new CachedPhotoRepository(photoCacheProvider, repository, 24, Calendar.HOUR);
+        return new CachedPhotoRepository(
+                photoCacheProvider,
+                repository,
+                Constants.CACHE_LIFETIME,
+                Constants.CACHE_LIFETIME_UNITS
+        );
     }
 
     @Provides
     @Singleton
     MediaManager provideMediaManager() {
         return new AndroidMediaManager(application);
+    }
+
+    @Provides
+    @Singleton
+    ImageLoader provideImageLoader() {
+        return new GlideImageLoader(application);
     }
 }

@@ -8,7 +8,8 @@
     android:viewportHeight="50.0">
     <gradient
         android:centerY="0.5"
-        android:endColor="#FA5858"
+        android:endColor="#0099CC"
+        android:centerColor="#FA5858"
         android:startColor="#0099CC"
         android:type="sweep"
         android:useLevel="false" />
