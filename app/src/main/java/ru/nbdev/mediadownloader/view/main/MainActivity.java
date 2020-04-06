@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -134,7 +135,10 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
     }
 
     private void recyclerInit() {
-        GridLayoutManager layoutManager = new GridLayoutManager(this, Constants.RECYCLER_COLUMNS);
+        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(
+                Constants.RECYCLER_COLUMNS,
+                StaggeredGridLayoutManager.VERTICAL
+        );
         recycler.setLayoutManager(layoutManager);
         recyclerAdapter = new MainRecyclerAdapter(this, presenter.getMainRecyclerPresenter());
         recycler.setAdapter(recyclerAdapter);
