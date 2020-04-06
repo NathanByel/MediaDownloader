@@ -1,7 +1,5 @@
 package ru.nbdev.mediadownloader.presenter;
 
-import android.graphics.drawable.Drawable;
-
 import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -11,7 +9,6 @@ import io.reactivex.schedulers.Schedulers;
 import moxy.InjectViewState;
 import moxy.MvpPresenter;
 import ru.nbdev.mediadownloader.R;
-import ru.nbdev.mediadownloader.common.image_loader.ImageLoader;
 import ru.nbdev.mediadownloader.common.media_manager.MediaManager;
 import ru.nbdev.mediadownloader.model.entity.Photo;
 import ru.nbdev.mediadownloader.model.repository.PhotoRepository;
@@ -21,16 +18,12 @@ import timber.log.Timber;
 @InjectViewState
 public class DetailPresenter extends MvpPresenter<DetailView> {
 
-    private final String IMAGE_LOADER_TAG = "DetailPresenter";
     private final long photoId;
     private final CompositeDisposable compositeDisposable;
     private Photo photo;
 
     @Inject
     MediaManager mediaManager;
-
-    @Inject
-    ImageLoader imageLoader;
 
     @Inject
     PhotoRepository photoRepository;
@@ -54,7 +47,6 @@ public class DetailPresenter extends MvpPresenter<DetailView> {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        imageLoader.cancelLoading(IMAGE_LOADER_TAG);
         compositeDisposable.clear();
     }
 
@@ -97,7 +89,7 @@ public class DetailPresenter extends MvpPresenter<DetailView> {
                 .subscribe(
                         photo -> {
                             this.photo = photo;
-                            showPhoto(photo);
+                            getViewState().showPhoto(photo);
                         },
                         throwable -> {
                             Timber.e(throwable, "photoRepository.loadPhotoById() error.");
@@ -106,23 +98,5 @@ public class DetailPresenter extends MvpPresenter<DetailView> {
                         }
                 );
         compositeDisposable.add(disposable);
-    }
-
-    private void showPhoto(Photo photo) {
-        imageLoader.loadImageFromUrl(photo.fullSizeURL, IMAGE_LOADER_TAG, new ImageLoader.OnReadyListener() {
-
-            @Override
-            public void onSuccess(Drawable image) {
-                photo.setDrawable(image);
-                getViewState().showPhoto(photo);
-            }
-
-            @Override
-            public void onError() {
-                Timber.e("imageLoader.loadImage() error.");
-                getViewState().showError();
-                getViewState().showMessage(R.string.load_error);
-            }
-        });
     }
 }

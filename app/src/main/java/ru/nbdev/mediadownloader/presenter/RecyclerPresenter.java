@@ -9,4 +9,6 @@ public interface RecyclerPresenter {
     void bindView(MainRecyclerAdapter.MainRecyclerViewHolderImpl mainRecyclerViewHolder);
 
     void onViewRecycled(MainRecyclerAdapter.MainRecyclerViewHolderImpl holder);
+
+    void onItemClick(long photoId);
 }

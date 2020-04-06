@@ -2,6 +2,7 @@ package ru.nbdev.mediadownloader.view.detail;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -16,23 +17,29 @@ import androidx.annotation.NonNull;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.google.android.material.snackbar.Snackbar;
 
+import javax.inject.Inject;
+
 import moxy.MvpAppCompatActivity;
 import moxy.presenter.InjectPresenter;
 import moxy.presenter.ProvidePresenter;
 import ru.nbdev.mediadownloader.R;
 import ru.nbdev.mediadownloader.app.App;
 import ru.nbdev.mediadownloader.common.Constants;
+import ru.nbdev.mediadownloader.common.image_loader.ImageLoader;
 import ru.nbdev.mediadownloader.model.entity.Photo;
 import ru.nbdev.mediadownloader.presenter.DetailPresenter;
+import timber.log.Timber;
 
 public class DetailActivity extends MvpAppCompatActivity implements DetailView {
 
+    private final String IMAGE_LOADER_TAG = "DetailPresenter";
     private PhotoView photoView;
     private LinearLayout layoutTopPanel;
     private ImageView iconDownload;
     private ImageView iconShare;
     private ImageView imageStatus;
     private Animation animationZoomInOut;
+    private final ImageLoader imageLoader = App.getAppComponent().getImageLoader();
 
     @InjectPresenter
     DetailPresenter presenter;
@@ -60,6 +67,7 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        imageLoader.cancelLoading(IMAGE_LOADER_TAG);
         presenter.onDestroy();
     }
 
@@ -76,12 +84,26 @@ public class DetailActivity extends MvpAppCompatActivity implements DetailView {
 
     @Override
     public void showPhoto(Photo photo) {
-        imageStatus.clearAnimation();
-        imageStatus.setVisibility(View.INVISIBLE);
+        showProgress();
+        imageLoader.loadImageFromUrl(photo.fullSizeURL, IMAGE_LOADER_TAG, new ImageLoader.OnReadyListener() {
 
-        setTopPanelVisibility(true);
-        photoView.setImageDrawable(photo.getDrawable());
-        photoView.setVisibility(View.VISIBLE);
+            @Override
+            public void onSuccess(Drawable image) {
+                imageStatus.clearAnimation();
+                imageStatus.setVisibility(View.INVISIBLE);
+
+                setTopPanelVisibility(true);
+                photoView.setImageDrawable(image);
+                photoView.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onError() {
+                Timber.e("imageLoader.loadImage() error.");
+                showError();
+                showMessage(R.string.load_error);
+            }
+        });
     }
 
     @Override

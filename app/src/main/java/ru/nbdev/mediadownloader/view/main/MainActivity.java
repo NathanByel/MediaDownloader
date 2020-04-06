@@ -12,8 +12,9 @@ import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import moxy.MvpAppCompatActivity;
 import moxy.presenter.InjectPresenter;
@@ -100,7 +101,12 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
         editSearchQuery.setOnKeyListener((v, keyCode, event) -> {
             if (event.getAction() == KeyEvent.ACTION_DOWN && (keyCode == KeyEvent.KEYCODE_ENTER)) {
                 clearSearchBarFocus();
-                presenter.onSearch(editSearchQuery.getText().toString());
+                String query = editSearchQuery.getText().toString();
+                presenter.onSearch(query);
+
+                Bundle bundle = new Bundle();
+                bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM, query);
+                App.getFirebaseAnalytics().logEvent(FirebaseAnalytics.Event.SEARCH, bundle);
                 return true;
             }
             return false;

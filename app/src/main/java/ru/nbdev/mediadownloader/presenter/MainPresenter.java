@@ -1,12 +1,6 @@
 package ru.nbdev.mediadownloader.presenter;
 
-import android.graphics.drawable.Drawable;
-import android.os.Bundle;
-
-import com.google.firebase.analytics.FirebaseAnalytics;
-
 import java.util.List;
-
 import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -16,7 +10,6 @@ import io.reactivex.schedulers.Schedulers;
 import moxy.InjectViewState;
 import moxy.MvpPresenter;
 import ru.nbdev.mediadownloader.R;
-import ru.nbdev.mediadownloader.app.App;
 import ru.nbdev.mediadownloader.common.image_loader.ImageLoader;
 import ru.nbdev.mediadownloader.model.entity.Photo;
 import ru.nbdev.mediadownloader.model.entity.SearchRequest;
@@ -84,10 +77,6 @@ public class MainPresenter extends MvpPresenter<MainView> {
     }
 
     private void searchPhotos(String query, PixabayFilter filter) {
-        Bundle bundle = new Bundle();
-        bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM, query);
-        App.getFirebaseAnalytics().logEvent(FirebaseAnalytics.Event.SEARCH, bundle);
-
         lastQuery = query;
         photosList = null;
         getViewState().showProgress();
@@ -126,26 +115,7 @@ public class MainPresenter extends MvpPresenter<MainView> {
             if (position < 0) {
                 return;
             }
-
-            Photo photo = photosList.get(position);
-            mainRecyclerViewHolder.showProgress();
-
-            imageLoader.loadImageFromUrl(photo.previewURL, String.valueOf(position), new ImageLoader.OnReadyListener() {
-
-                @Override
-                public void onSuccess(Drawable image) {
-                    Timber.d("onResourceReady: bind pos %d, id %d, url %s", position, photo.id, photo.previewURL);
-                    photo.setDrawable(image);
-                    mainRecyclerViewHolder.showPhoto(photo);
-                    mainRecyclerViewHolder.setOnImageClickListener(v -> onItemClick(photo.id));
-                }
-
-                @Override
-                public void onError() {
-                    Timber.e("loadImageFromUrl() error.");
-                    mainRecyclerViewHolder.showError();
-                }
-            });
+            mainRecyclerViewHolder.showPhoto(photosList.get(position));
         }
 
         @Override
@@ -158,7 +128,7 @@ public class MainPresenter extends MvpPresenter<MainView> {
             imageLoader.cancelLoading(String.valueOf(position));
         }
 
-        private void onItemClick(long photoId) {
+        public void onItemClick(long photoId) {
             getViewState().runDetailActivity(photoId);
         }
     }

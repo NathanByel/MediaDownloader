@@ -1,6 +1,7 @@
 package ru.nbdev.mediadownloader.view.main;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,13 +16,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.Locale;
 
 import ru.nbdev.mediadownloader.R;
+import ru.nbdev.mediadownloader.app.App;
+import ru.nbdev.mediadownloader.common.image_loader.ImageLoader;
 import ru.nbdev.mediadownloader.model.entity.Photo;
 import ru.nbdev.mediadownloader.presenter.RecyclerPresenter;
+import timber.log.Timber;
 
 public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapter.MainRecyclerViewHolderImpl> {
 
     private final RecyclerPresenter recyclerPresenter;
     private final Animation progressAnimation;
+    private final ImageLoader imageLoader = App.getAppComponent().getImageLoader();
 
 
     public MainRecyclerAdapter(Context context, RecyclerPresenter recyclerPresenter) {
@@ -72,20 +77,32 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
             tvLikes = itemView.findViewById(R.id.textview_likes);
         }
 
-        public void setOnImageClickListener(View.OnClickListener listener) {
-            ivPhoto.setOnClickListener(listener);
-        }
-
         @Override
         public void showPhoto(Photo photo) {
-            ivStatus.clearAnimation();
-            ivStatus.setVisibility(View.INVISIBLE);
+            showProgress();
+            int position = getAdapterPosition();
+            imageLoader.loadImageFromUrl(photo.previewURL, String.valueOf(position), new ImageLoader.OnReadyListener() {
 
-            ivPhoto.setImageDrawable(photo.getDrawable());
-            ivPhoto.setVisibility(View.VISIBLE);
-            tvViews.setText(formatNumberToString(photo.views));
-            tvLikes.setText(formatNumberToString(photo.likes));
-            layoutInfo.setVisibility(View.VISIBLE);
+                @Override
+                public void onSuccess(Drawable image) {
+                    Timber.d("onResourceReady: bind pos %d, id %d, url %s", position, photo.id, photo.previewURL);
+                    ivStatus.clearAnimation();
+                    ivStatus.setVisibility(View.INVISIBLE);
+
+                    ivPhoto.setOnClickListener(v -> recyclerPresenter.onItemClick(photo.id));
+                    ivPhoto.setImageDrawable(image);
+                    ivPhoto.setVisibility(View.VISIBLE);
+                    tvViews.setText(formatNumberToString(photo.views));
+                    tvLikes.setText(formatNumberToString(photo.likes));
+                    layoutInfo.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onError() {
+                    Timber.e("loadImageFromUrl() error.");
+                    showError();
+                }
+            });
         }
 
         @Override
